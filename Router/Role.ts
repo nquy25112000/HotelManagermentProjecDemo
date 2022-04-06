@@ -23,7 +23,7 @@ export class RoleRouter {
         this.Router.post('/findItem', Controller.findItem);
 
         this.Router.post('/create', Controller.create);
-        this.Router.put('/update', Controller.update);
+        this.Router.put('/update/:id', Controller.update);
         this.Router.delete('/delete/:id', Controller.delete);
     }
 

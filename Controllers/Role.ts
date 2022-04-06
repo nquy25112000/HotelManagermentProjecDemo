@@ -11,43 +11,53 @@ const baseController = new BaseController();
 export class RoleController {
 
 
-    public findAll = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const result = await service.findAll();
+    public findAll = (req: Request, res: Response, next: NextFunction) => {
+
+        service.findAll()
+        .then(result => {
             baseController.sendResponse(result, req, res);
-        }
-        catch (err) {
-            err
-        }
+        })
+        .catch(err => { res.json(err); });
 
-        ///anh yeu em
+}
 
-    }
-
-    public create = async (req: Request, res: Response, next: NextFunction) => {
+    public create =  (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
         item.uuid = uuidv4();
-        const result = await service.create(item);
-        baseController.sendResponse(result, req, res);
+        service.create(item)
+        .then(result => {
+            baseController.sendResponse(result, req, res);
+        })
+        .catch(err => { res.json(err); });
     }
 
-    public update = async (req: Request, res: Response, next: NextFunction) => {
+    public update =  (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        const id = item.id;
-        const result = await service.update(id, item);
-        baseController.sendResponse(result, req, res);
+          const id = req.params.id;
+          item.updatedAt = new Date();
+        service.update(id, item)
+        .then(result => {
+            baseController.sendResponse(result, req, res);
+        })
+        .catch(err => { res.json(err); });
     }
 
-    public findOne = async (req: Request, res: Response, next: NextFunction) => {
+    public findOne =  (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        const id = item.id;
-        const result = await service.findOne(id);
-        baseController.sendResponse(result, req, res);
+          const id = req.params.id;
+        service.findOne(id)
+        .then(result => {
+            baseController.sendResponse(result, req, res);
+        })
+        .catch(err => { res.json(err); });
     }
-    public findItem = async (req: Request, res: Response, next: NextFunction) => {
+    public findItem =  (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        const result = await service.findItem(item);
-        baseController.sendResponse(result, req, res);
+        service.findItem(item)
+        .then(result => {
+            baseController.sendResponse(result, req, res);
+        })
+        .catch(err => { res.json(err); });
 
     }
 
@@ -58,6 +68,7 @@ export class RoleController {
                 baseController.sendResponse(result, req, res);
             })
             .catch(err => { res.json(err); });
+
     }
 }
 

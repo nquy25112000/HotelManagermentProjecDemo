@@ -2,48 +2,72 @@ import { ServiceOrdersService } from '../Services/ServiceOrders'
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { StatusCode } from './StatusCode';
+import { BaseController } from './BaseController';
+const baseController = new BaseController();
 const statusCode = new StatusCode();
 const service = new ServiceOrdersService();
 
 export class ServiceOrdersController {
 
 
-    public findAll = async (req: Request, res: Response, next: NextFunction) => {
-        const result = await service.findAll();
-        statusCode.OK(res, result);
+    public findAll = (req: Request, res: Response, next: NextFunction) => {
+
+        service.findAll()
+            .then(result => {
+                baseController.sendResponse(result, req, res);
+            })
+            .catch(err => { res.json(err); });
+
+
+
     }
 
-    public create = async (req: Request, res: Response, next: NextFunction) => {
+    public create = (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        item.id = uuidv4();
-        await service.create(item);
-        statusCode.OK(res);
+        service.create(item)
+            .then(result => {
+                baseController.sendResponse(result, req, res);
+            })
+            .catch(err => { res.json(err); });
     }
 
-    public update = async (req: Request, res: Response, next: NextFunction) => {
+    public update = (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        const id = item.id;
-        await service.update(id, item);
-        statusCode.OK(res);
-    }
-
-    public findOne = async (req: Request, res: Response, next: NextFunction) => {
-        const item = req.body;
-        const id = item.id;
-        const result = await service.findOne(id);
-        statusCode.OK(res);
-    }
-    public findItem = async (req: Request, res: Response, next: NextFunction) => {
-        const item = req.body;
-        const result = await service.findItem(item);
-        statusCode.OK(res);
-
-    }
-
-    public delete = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.params.id;
-        const rs = await service.delete(id);
-        statusCode.OK(res);
+        item.updatedAt = new Date();
+        service.update(id, item)
+            .then(result => {
+                baseController.sendResponse(result, req, res);
+            })
+            .catch(err => { res.json(err); });
+    }
+
+    public findOne = (req: Request, res: Response, next: NextFunction) => {
+        const item = req.body;
+        const id = req.params.id;
+        service.findOne(id)
+            .then(result => {
+                baseController.sendResponse(result, req, res);
+            })
+            .catch(err => { res.json(err); });
+    }
+    public findItem = (req: Request, res: Response, next: NextFunction) => {
+        const item = req.body;
+        service.findItem(item)
+            .then(result => {
+                baseController.sendResponse(result, req, res);
+            })
+            .catch(err => { res.json(err); });
+
+    }
+
+    public delete = (req: Request, res: Response, next: NextFunction) => {
+        const id = req.params.id;
+        service.delete(id)
+            .then(result => {
+                baseController.sendResponse(result, req, res);
+            })
+            .catch(err => { res.json(err); });
 
     }
 }

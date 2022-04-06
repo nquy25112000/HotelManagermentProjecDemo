@@ -20,13 +20,13 @@ export abstract class KnexRepository<T> implements RepositoryGeneral<T> {
             .select()
     }
 
-    create(item: T[]): Promise<T[]> {
+    create(item: T[]): Promise<any> {
         return knex(this.tableName)
             .insert(item)
     }
     update(id: string, item: T[]): Promise<T[]> {
         return knex(this.tableName)
-            .where('id', '=', id)
+            .where('uuid', '=', id)
             .update(item)
     }
     findOne(id: string): Promise<boolean> {
