@@ -18,7 +18,7 @@ export class UsersController extends BaseController {
 
     public create = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        item.id = uuidv4();
+        item.uuid = uuidv4();
         const result = await service.create(item);
         this.sendResponse(result, req, res);
     }

@@ -25,7 +25,7 @@ export class BookRoomController  extends BaseController{
 
     public create =  (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        item.id = uuidv4();
+        item.uuid = uuidv4();
         service.create(item)
         .then(result => {
             baseController.sendResponse(result, req, res);
