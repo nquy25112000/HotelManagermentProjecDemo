@@ -26,8 +26,8 @@ export class UsersRouter {
         this.Router.post('/findItem', Controller.findItem);
 
         this.Router.post('/create', Controller.create);
-        this.Router.put('/update', Controller.update);
-        this.Router.delete('/delete', Controller.delete);
+        this.Router.put('/update/:id', Controller.update);
+        this.Router.delete('/delete/:id', Controller.delete);
         this.Router.delete('/login', Controller.delete);
     }
 
