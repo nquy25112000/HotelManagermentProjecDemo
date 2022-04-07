@@ -43,7 +43,7 @@ const bookRoomRouter = new BookRoomRouter();
 
 class Server {
     public app: express.Application
-    PORT: number = 3000;
+    PORT: number = 4000;
 
     constructor() {
         this.app = express();
@@ -70,29 +70,29 @@ class Server {
     }
 
     public router(): void {
-        this.app.use('/role', roleRouter.Router)
-            .use('/users', usersRouter.Router)
-            .use('/hotel', holtelRouter.Router)
-            .use('/room', roomRouter.Router)
-            .use('/bill', billRouter.Router)
-            .use('/services', serviceRouter.Router)
-            .use('/orders', serviceOrdersRouter.Router)
-            .use('/bookroom', bookRoomRouter.Router)
-
+        this.app
+            .use('/role', tokenController.authorization, tokenController.RoleRoot, roleRouter.Router)
+            .use('/users', tokenController.authorization, tokenController.RoleRoot, usersRouter.Router)
+            .use('/hotel', tokenController.authorization, tokenController.RoleRoot, holtelRouter.Router)
+            .use('/room', tokenController.authorization, tokenController.RoleRoot, roomRouter.Router)
+            .use('/bill', tokenController.authorization, tokenController.RoleRoot, billRouter.Router)
+            .use('/services', tokenController.authorization, tokenController.RoleRoot, serviceRouter.Router)
+            .use('/orders', tokenController.authorization, tokenController.RoleRoot, serviceOrdersRouter.Router)
+            .use('/bookroom', tokenController.authorization, tokenController.RoleRoot, bookRoomRouter.Router)
             .post('/login', passportController.Authenticate, tokenController.createToken)
 
 
 
-            .get('/test', tokenController.authorization, (req, res) => {
+            .get('/test', tokenController.authorization, tokenController.RoleRoot, (req, res) => {
 
-                res.json("hello")
+                res.json("đăng nhập thành công")
 
             })
 
 
     }
     public start(): void {
-        this.app.listen(3000, () => {
+        this.app.listen(4000, () => {
 
             console.log(`server running at port: ${this.PORT}`);
         });
