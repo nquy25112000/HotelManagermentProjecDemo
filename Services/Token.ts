@@ -30,18 +30,32 @@ export class TokenService {
 
 
     public checkToken = async (token: any) => {
+        if (token == undefined) {
+            return Promise.reject({ messager: "Need verification code" });
+        }
         const findOne = await repository.findOne(token)
         if (Object.keys(findOne).length == 0) {
-            return Promise.reject({ messager: "You Need Login" });
+            return Promise.reject({ messager: "Invalid verification code" });
         }
         return Promise.resolve(findOne);
     }
+
+
+    public checkRoleToken = async (token: any) => {
+        const result = await repository.findJoin(token)
+        const roleName = result[0].name;
+        if (roleName == "Root") {
+            return Promise.resolve();
+        }
+        return Promise.reject({ messager: "You Forbidden" });
+    }
+
 
     public checkTimeToken = async (date: any) => {
         const dateNow = new Date().getTime();
         console.log()
         if (dateNow - date.getTime() >= 0) {
-            return Promise.reject({ messager: "You need to login again" });
+            return Promise.reject({ messager: "Session has expired, please login again" });
         }
         return Promise.resolve();
     }

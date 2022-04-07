@@ -14,4 +14,18 @@ export class TokenRepository {
             .select()
             .where({ tokenCode: token })
     }
+
+    findJoin(token: string): Promise<any> {
+        return knex.table('Role')
+            .select("Role.name")
+            .innerJoin("Users", "Users.roleId", "=", "Role.uuid")
+            .innerJoin("Token", "Token.userId", "=", "Users.uuid")
+            .where("Token.tokenCode", "=", token)
+
+
+
+        // .andWhere("Users.roleId", "=", "Role.uuid")
+
+        // .andWhere()
+    }
 }
