@@ -13,5 +13,6 @@ export class Room extends bookshelf.Model<Room> {
     bookrome(): Bookshelf.Collection<BookRoom> {
         return this.hasMany(BookRoom, 'roomId');
     }
+    name: any;
 
 }

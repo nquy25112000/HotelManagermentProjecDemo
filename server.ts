@@ -1,6 +1,7 @@
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
+import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
@@ -53,7 +54,6 @@ class Server {
 
     }
 
-
     public config(): void {
         this.app.use(express.json())
             .use(
@@ -66,19 +66,20 @@ class Server {
             )
             .use(passport.initialize())
             .use(passport.session())
+            .use(cors())
 
     }
 
     public router(): void {
         this.app
-            .use('/role', tokenController.authorization, tokenController.RoleRoot, roleRouter.Router)
-            .use('/users', tokenController.authorization, tokenController.RoleRoot, usersRouter.Router)
-            .use('/hotel', tokenController.authorization, tokenController.RoleRoot, holtelRouter.Router)
-            .use('/room', tokenController.authorization, tokenController.RoleRoot, roomRouter.Router)
-            .use('/bill', tokenController.authorization, tokenController.RoleRoot, billRouter.Router)
-            .use('/services', tokenController.authorization, tokenController.RoleRoot, serviceRouter.Router)
-            .use('/orders', tokenController.authorization, tokenController.RoleRoot, serviceOrdersRouter.Router)
-            .use('/bookroom', tokenController.authorization, tokenController.RoleRoot, bookRoomRouter.Router)
+            .use('/role', roleRouter.Router)
+            .use('/users', usersRouter.Router)
+            .use('/hotel', holtelRouter.Router)
+            .use('/room', roomRouter.Router)
+            .use('/bill', billRouter.Router)
+            .use('/services', serviceRouter.Router)
+            .use('/orders', serviceOrdersRouter.Router)
+            .use('/bookroom', bookRoomRouter.Router)
             .post('/login', passportController.Authenticate, tokenController.createToken)
 
 
@@ -86,7 +87,6 @@ class Server {
             .get('/test', tokenController.authorization, tokenController.RoleRoot, (req, res) => {
 
                 res.json("đăng nhập thành công")
-
             })
 
 

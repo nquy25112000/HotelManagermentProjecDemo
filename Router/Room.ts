@@ -20,6 +20,7 @@ export class RoomRouter {
         this.Router.get('/findAll', Controller.findAll);
         this.Router.get('/findOne/:id', Controller.findOne);
         this.Router.post('/findItem', Controller.findItem);
+        this.Router.get('/check', Controller.check);
 
         this.Router.post('/create', Controller.create);
         this.Router.put('/update/:id', Controller.update);

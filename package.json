@@ -11,6 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/bookshelf": "^1.2.7",
+    "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/express-session": "^1.17.4",
     "@types/jsonwebtoken": "^8.5.8",
@@ -26,6 +27,7 @@
     "body-parser": "^1.19.2",
     "bookshelf": "^1.2.0",
     "cloudmailin": "^0.0.3",
+    "cors": "^2.8.5",
     "db-migrate": "^0.11.13",
     "db-migrate-mysql": "^2.2.0",
     "dotenv": "^16.0.0",
