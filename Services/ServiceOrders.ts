@@ -1,7 +1,9 @@
 import { ServiceOrdersRepository } from '../Repositories/Repository/ServiceOrders';
+import { ServiceRepository } from '../Repositories/Repository/Service';
 import { v4 as uuidv4 } from 'uuid';
 
 const Repository = new ServiceOrdersRepository();
+const serviceRepo  = new ServiceRepository();
 
 
 export class ServiceOrdersService {
@@ -16,9 +18,14 @@ export class ServiceOrdersService {
     public create = async (item: any) => {
         var object: any = [];
         for (let i = 0; i < item.order.length; i++) {
+            const serviceid = item.order[i].serviceId; // get id service
+            const service : any = await serviceRepo.findOne(serviceid); // get price   console.log(service[0].price)
+            const total = service[0].price * item.order[i].number;
+            item.order[i].total = total;
             item.order[i].uuid = uuidv4();
             object.push(item.order[i])
         }
+        console.log(object);
         const rs = await Repository.create(object);
         if (rs == null) {
             return Promise.reject({ messager: "Create Faild " })

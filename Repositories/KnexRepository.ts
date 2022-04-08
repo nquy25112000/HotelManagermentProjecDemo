@@ -41,4 +41,6 @@ export abstract class KnexRepository<T> implements RepositoryGeneral<T> {
             .where(item)
             .select()
     }
+
+    
 }
