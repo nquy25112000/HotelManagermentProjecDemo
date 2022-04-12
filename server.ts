@@ -1,6 +1,7 @@
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
+import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
@@ -53,7 +54,6 @@ class Server {
 
     }
 
-
     public config(): void {
         this.app.use(express.json())
             .use(
@@ -66,6 +66,7 @@ class Server {
             )
             .use(passport.initialize())
             .use(passport.session())
+            .use(cors())
 
     }
 
@@ -86,7 +87,6 @@ class Server {
             .get('/test', tokenController.authorization, tokenController.RoleRoot, (req, res) => {
 
                 res.json("đăng nhập thành công")
-
             })
 
 

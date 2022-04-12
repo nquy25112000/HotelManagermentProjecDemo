@@ -39,21 +39,16 @@ export class TokenService {
         }
         return Promise.resolve(findOne);
     }
-
-
     public checkRoleToken = async (token: any) => {
-        const result = await repository.findJoin(token)
+        const result = await repository.findJoin(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Root") {
             return Promise.resolve();
         }
         return Promise.reject({ messager: "You Forbidden" });
     }
-
-
     public checkTimeToken = async (date: any) => {
         const dateNow = new Date().getTime();
-        console.log()
         if (dateNow - date.getTime() >= 0) {
             return Promise.reject({ messager: "Session has expired, please login again" });
         }
