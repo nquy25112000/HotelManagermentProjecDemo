@@ -76,6 +76,7 @@ class Server {
             .use('/users', tokenController.authorization, tokenController.RoleRoot, usersRouter.Router)
             .use('/hotel', tokenController.authorization, tokenController.RoleRoot, holtelRouter.Router)
             .use('/room', tokenController.authorization, tokenController.RoleRoot, roomRouter.Router)
+            // .use('/bill', billRouter.Router)
             .use('/bill', tokenController.authorization, tokenController.RoleRoot, billRouter.Router)
             .use('/services', tokenController.authorization, tokenController.RoleRoot, serviceRouter.Router)
             .use('/orders', tokenController.authorization, tokenController.RoleRoot, serviceOrdersRouter.Router)

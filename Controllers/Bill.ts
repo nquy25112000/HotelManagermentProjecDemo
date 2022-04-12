@@ -25,7 +25,7 @@ export class BillController {
         .then(result => {
             baseController.sendResponse(result, req, res);
         })
-        .catch(err => { res.json(err); });
+        .catch(err => {baseController.sendResponse(err, req, res.status(400)); });
     }
 
     public update =  (req: Request, res: Response, next: NextFunction) => {

@@ -1,10 +1,11 @@
 
 import { Connect } from '../../Config/connect';
 import { BookRoom } from '../../Models/BookRoom'
-import { KnexRepository } from '../KnexRepository'
+import { KnexRepository } from '../KnexRepository';
 
-const bookRoom = new BookRoom();
 const knex = new Connect().knex;
+const bookRoom = new BookRoom();
+
 export class BookRoomRepository extends KnexRepository<BookRoom> {
     constructor() {
         super(bookRoom.tableName);
@@ -18,3 +19,4 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
     }
 
 }
+
