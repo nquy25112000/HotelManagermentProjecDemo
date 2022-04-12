@@ -16,5 +16,8 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
             .andWhere('toDate', '>=', `${date}`)
             .select();
     }
+    getHour(id: string): Promise<BookRoom[]> {
+        return knex.column('fromDate', 'toDate').where('uuid ', '=', id).select().from(this.tableName)
+    }
 
 }
