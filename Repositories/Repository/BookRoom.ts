@@ -9,10 +9,12 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
     constructor() {
         super(bookRoom.tableName);
     }
-
-    findCustomersIdCard(idCard: any): Promise<any> {
+    findRoomId(roomId: any, date: any): Promise<any> {
         return knex.table(bookRoom.tableName)
-            .where({ customerIdCard: idCard })
-            .select()
+            .where('roomId', '=', roomId)
+            .andWhere('fromDate', '<=', `${date}`)
+            .andWhere('toDate', '>=', `${date}`)
+            .select();
     }
+
 }
