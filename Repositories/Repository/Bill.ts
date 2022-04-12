@@ -19,11 +19,19 @@ export class BillRepository extends KnexRepository<Bill> {
     getTimeAndPrice (id : string):  Promise<any[]>{
         const tableBookRoom : any = bookRoom.tableName;
         const tableRoom : any = room.tableName;
-        return knex(tableRoom) .join(tableBookRoom, tableBookRoom.roomId, '=', tableRoom.uuid)
-                .select(tableBookRoom.uuid, tableBookRoom.fromDate, tableBookRoom.toDate,tableRoom.price  );
-        ;
+        return knex.select('BookRoom.uuid' ,'BookRoom.customerName','BookRoom.customersIdCard', 'BookRoom.fromDate', 'BookRoom.toDate','BookRoom.userId' ,'Room.name' ,'Room.type','Room.price')
+                .from('BookRoom').join('Room', function() {
+                this.on('BookRoom.roomId', '=', ' Room.uuid').andOn('BookRoom.uuid', knex.raw('?', [id ]) )})    
     }
-    // SELECT BookRoom.uuid , BookRoom.fromDate, BookRoom.toDate , Room.price FROM BookRoom INNER JOIN Room on BookRoom.roomId = Room.uuid and BookRoom.uuid = "817117c3-1093-442f-bd1e-09431faaace2"
-    //knex('users') .join('contacts', 'users.id', '=', 'contacts.user_id').select('users.id', 'contacts.phone')
+
+    getInforserviceOrder (idBookRoom : string): Promise<any[]>{
+        return knex.select('Services.name' , 'Services.price', 'Serviceorders.number' , 'Serviceorders.total').from('Serviceorders').join('Services', function() {
+            this.on('Serviceorders.serviceId ', '=', ' Services.uuid').andOn('Serviceorders.bookRoomId', knex.raw('?', [idBookRoom ]) )})    
+    }
+
+    getInforUser (idBookRoom : string): Promise<any[]>{
+        return knex.select('Services.name' , 'Services.price', 'Serviceorders.number' , 'Serviceorders.total').from('Serviceorders').join('Services', function() {
+            this.on('Serviceorders.serviceId ', '=', ' Services.uuid').andOn('Serviceorders.bookRoomId', knex.raw('?', [idBookRoom ]) )})    
+    }
 
 }

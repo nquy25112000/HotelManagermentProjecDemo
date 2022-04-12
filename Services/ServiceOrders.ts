@@ -25,7 +25,6 @@ export class ServiceOrdersService {
             item.order[i].uuid = uuidv4();
             object.push(item.order[i])
         }
-        console.log(object);
         const rs = await Repository.create(object);
         if (rs == null) {
             return Promise.reject({ messager: "Create Faild " })
