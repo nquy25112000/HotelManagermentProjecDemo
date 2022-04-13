@@ -21,14 +21,25 @@ export class ServiceOrdersController {
 
 
     }
+    // try {
+    //     await service.checkHotelId(item.hotelId);
+    //     await service.checkPriceValidate(item.price)
+    //     await service.checkValidateRoomName(item.name)
+    //     const result = await service.create(item)
+    //     baseController.sendResponse(result, req, res);
+    // }
+    // catch (err) {
+    //     res.json(err);
+    // }
 
-    public create = (req: Request, res: Response, next: NextFunction) => {
-        const item = req.body;
-        service.create(item)
-            .then(result => {
-                baseController.sendResponse(result, req, res);
-            })
-            .catch(err => { res.json(err); });
+    public create = async(req: Request, res: Response, next: NextFunction) => {
+        try {
+            const item = req.body;
+            const rs = await service.create(item);
+            baseController.sendResponse(rs, req, res);
+        } catch (error) {
+            baseController.sendResponse(error, req, res.status(404));
+        }
     }
 
     public update = (req: Request, res: Response, next: NextFunction) => {
@@ -39,13 +50,13 @@ export class ServiceOrdersController {
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })
-            .catch(err => { res.json(err); });
+            .catch(err => { baseController.sendResponse(err, req, res.status(404)); });
     }
 
     public findOne = (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
         const id = req.params.id;
-        service.findOne(id)
+        service.findServiceByBookroom(id)
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })

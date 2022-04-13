@@ -13,7 +13,34 @@ export class HotelService {
         return Promise.resolve({result : rs})
     }
 
-    public create = async (item: []) => {
+    public checkvalidateHotel  = async (item : any) => {
+        if(typeof item.name === "undefined" || !item.name ){
+            return Promise.reject({ messager: "Name Invalid !" });
+        }
+        const name = await Repository.checkNameHotel(item.name);
+        if (Object.keys(name).length > 0) {
+            return Promise.reject({ messager: "Name already exists !" });
+        }
+        if(!item.adress  || typeof item.adress === "undefined" ){
+            return Promise.reject({ messager: "Adress Invalid !" });
+        }
+        if(!item.phone  || typeof item.phone === "undefined" ){
+            return Promise.reject({ messager: "Phone Invalid !" });
+        }
+        if(item.phone.length < 10){
+            return Promise.reject({ messager: "Please enter the correct phone number !" });
+        }
+        var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+        var valid = emailRegex.test(item.email);
+        if(!item.email || !valid){
+             return Promise.reject({ messager: "Please enter the correct email !" });
+        }
+    }
+
+
+    public create = async (item: any) => {
+        console.log(item.name);
+        const ob = await new HotelService().checkvalidateHotel(item);
         const rs = await Repository.create(item);
         if (rs == null) {
             return Promise.reject({messager : "Create Faild "})

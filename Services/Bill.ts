@@ -73,11 +73,22 @@ export class BillService {
     }
 
     public findOne = async (id: string) => {
-        const rs = await Repository.findOne(id)
-        if (rs == false) {
+        try {
+            const rs : any = await Repository.findOne(id);
+            const {price, inforBookroom} : any = await new BillService().getBookroomdAndPrice(rs[0].bookRoomId);
+            const inforUser : any = await userRepo.findOne(inforBookroom[0].userId); // Property '0' does not exist on type 'Boolean'
+            const inforServiceOder : any = await   Repository.getInforserviceOrder(rs[0].bookRoomId)
+            if (rs) {
+                return Promise.resolve({
+                    inforBill : rs,
+                    inforBookroom : inforBookroom , 
+                    inforServiceOder : inforServiceOder,
+                    inforUser : inforUser[0].fullName,
+                })
+            }
+        } catch (error) {
             return Promise.reject({messager :"Not Found"} )
         }
-        return Promise.resolve({result : rs})
     }
     public findItem = async (item: []) => {
         const rs = await Repository.findItem(item);
