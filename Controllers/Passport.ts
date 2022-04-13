@@ -36,14 +36,14 @@ export class Passport {
     public deserializeUser = passport.deserializeUser(async (username: any, done) => { //hàm giải mã định dạng
         done(null, username)
     })
-    
+
 
     public Authenticate = (req: Request, res: Response, next: NextFunction) => {
         passport.authenticate('local', (err, user) => {
 
             if (!user) return res.status(401).json({ message: "Wrong login information" });
             else {
-                req.params.uuid = user[0].uuid
+                req.user = user[0].uuid
                 next();
             }
 

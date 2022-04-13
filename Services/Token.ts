@@ -18,11 +18,13 @@ export class TokenService {
             uuid: uuidv4(),
             tokenCode: accesToken,
             userId: userId,
-            dateCreated: date
+            timeExpire: date
         }
         const rs = await repository.create(item);
         if (rs) {
-            return Promise.resolve({ messager: "Sucsess", Token: accesToken })
+            const checkRole = await repository.findJoin(accesToken);
+            const role = checkRole[0].name;
+            return Promise.resolve({ messager: "Sucsess", Token: accesToken, role: role })
         }
         return Promise.reject({ messager: "Create Faild" })
 

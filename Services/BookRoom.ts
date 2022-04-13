@@ -74,7 +74,7 @@ export class BookRoomService {
             return Promise.reject({ messager: "The reservation date cannot be less than the current date" })
         }
         else {
-            const findRoomId = await Repository.findRoomId(RoomId, date);
+            const findRoomId = await Repository.findRoomIdAndFromDateToDate(RoomId, date);
             const lengthObject = Object.keys(findRoomId).length;
             if (lengthObject > 0) {
                 const fromDateOfObject = findRoomId[0].fromDate
@@ -92,7 +92,7 @@ export class BookRoomService {
             return Promise.reject({ messager: "Payment date must not be less than reservation date" })
         }
         else {
-            const findRoomId = await Repository.findRoomId(RoomId, Tdate);
+            const findRoomId = await Repository.findRoomIdAndFromDateToDate(RoomId, Tdate);
             const lengthObject = Object.keys(findRoomId).length;
             if (lengthObject > 0) {
                 const fromDateOfObject = findRoomId[0].fromDate

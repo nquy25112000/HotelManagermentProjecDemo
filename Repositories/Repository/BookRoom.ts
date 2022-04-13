@@ -10,7 +10,7 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
     constructor() {
         super(bookRoom.tableName);
     }
-    findRoomId(roomId: any, date: any): Promise<any> {
+    findRoomIdAndFromDateToDate(roomId: any, date: any): Promise<any> {
         return knex.table(bookRoom.tableName)
             .where('roomId', '=', roomId)
             .andWhere('fromDate', '<=', `${date}`)
@@ -20,6 +20,15 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
     getHour(id: string): Promise<BookRoom[]> {
         return knex.column('fromDate', 'toDate').where('uuid ', '=', id).select().from(this.tableName)
     }
-
+    findRoomId(id: string): Promise<any> {
+        return knex.table(bookRoom.tableName)
+            .where('roomId', '=', id)
+            .select();
+    }
+    findUsers(id: string): Promise<any> {
+        return knex.table(bookRoom.tableName)
+            .where('userId', '=', id)
+            .select();
+    }
 }
 

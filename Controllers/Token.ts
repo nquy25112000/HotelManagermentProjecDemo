@@ -8,7 +8,7 @@ const service = new TokenService();
 export class TokenController extends BaseController {
 
     public createToken = async (req: Request, res: Response, next: NextFunction) => {
-        const userId = req.params.uuid;
+        const userId = req.user;
         try {
             const result = await service.createToken(userId);
             this.sendResponse(result, req, res)
@@ -24,7 +24,7 @@ export class TokenController extends BaseController {
         service.checkToken(token)
             .then(result => {
                 if (result) {
-                    const time  = result[0].dateCreated;
+                    const time = result[0].timeExpire;
                     service.checkTimeToken(time)
                         .then(() => {
                             next();
