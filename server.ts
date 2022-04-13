@@ -73,12 +73,15 @@ class Server {
         this.app
             .use('/role', tokenController.authorization, tokenController.RoleRoot, roleRouter.Router)
             .use('/users', tokenController.authorization, tokenController.RoleRoot, usersRouter.Router)
-            .use('/hotel', tokenController.authorization, tokenController.RoleRoot, holtelRouter.Router)
+            .use('/hotel',  holtelRouter.Router)
+            // .use('/hotel', tokenController.authorization, tokenController.RoleRoot, holtelRouter.Router)
             .use('/room', tokenController.authorization, tokenController.RoleRoot, roomRouter.Router)
-            // .use('/bill', billRouter.Router)
-            .use('/bill', tokenController.authorization, tokenController.RoleRoot, billRouter.Router)
+             .use('/bill', billRouter.Router)
+            // .use('/bill', tokenController.authorization, tokenController.RoleRoot, billRouter.Router)
             .use('/services', tokenController.authorization, tokenController.RoleRoot, serviceRouter.Router)
-            .use('/orders', tokenController.authorization, tokenController.RoleRoot, serviceOrdersRouter.Router)
+            // .use('/orders', tokenController.authorization, tokenController.RoleRoot, serviceOrdersRouter.Router)
+            .use('/orders', serviceOrdersRouter.Router)
+            
             .use('/bookroom', tokenController.authorization, tokenController.RoleRoot, bookRoomRouter.Router)
             .post('/login', passportController.Authenticate, tokenController.createToken)
 

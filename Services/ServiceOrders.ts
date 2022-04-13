@@ -1,9 +1,13 @@
 import { ServiceOrdersRepository } from '../Repositories/Repository/ServiceOrders';
 import { ServiceRepository } from '../Repositories/Repository/Service';
+import {BillRepository} from '../Repositories/Repository/Bill';
+import {BookRoomRepository} from '../Repositories/Repository/BookRoom';
 import { v4 as uuidv4 } from 'uuid';
 
 const Repository = new ServiceOrdersRepository();
 const serviceRepo  = new ServiceRepository();
+const BillRepo = new BillRepository();
+const BookroomRepo = new BookRoomRepository();
 
 
 export class ServiceOrdersService {
@@ -15,31 +19,105 @@ export class ServiceOrdersService {
         return Promise.resolve({ result: rs })
     }
 
+    public checkvalidateBookRoom  = async (bookRoomId : string) => {
+        if(typeof bookRoomId === "undefined"){
+            return Promise.reject({ messager: "BookRoom undefined !" })
+        }
+        const rs = await BookroomRepo.findOne(bookRoomId);
+        
+        if (Object.keys(rs).length == 0) {
+            return Promise.reject({ messager: "BookRoom Invalid !" })
+        }
+        else {
+            return Promise.resolve( rs );
+        }
+    }
+
+    public checkvalidateServiceOrder  = async (serviceOrderId : any) => {
+        const rs = await Repository.findOne(serviceOrderId);
+        if (Object.keys(rs).length == 0) {
+            return Promise.reject({ messager: "BookRoom Invalid !" })
+        }
+        else {
+            return Promise.resolve( rs );
+        }
+
+    }
+
+    public checkvalidateNumberService  = async (number : any) => {
+        if(typeof number === "undefined"){
+            return Promise.reject({ messager: "Number undefined !" })
+        }
+        if (number < 1 || typeof number === "string") {
+            return Promise.reject({ messager: "Number Invalid !" })
+        }
+        else {
+            return Promise.resolve( number );
+        }
+    }
+
+    public checkvalidateServive  = async (serviceId : string) => {
+        if(typeof serviceId === "undefined"){
+            return Promise.reject({ messager: "ServiceId undefined !" })
+        }
+        const rs = await serviceRepo.findOne(serviceId);
+        if (Object.keys(rs).length == 0) {
+            return Promise.reject({ messager: "Service Invalid !" })
+        }
+        else {
+            return Promise.resolve( rs );
+        }
+    }
+
     public create = async (item: any) => {
-        var object: any = [];
-        for (let i = 0; i < item.order.length; i++) {
-            const serviceid = item.order[i].serviceId; // get id service
-            const service : any = await serviceRepo.findOne(serviceid); // get price   console.log(service[0].price)
-            const total = service[0].price * item.order[i].number;
-            item.order[i].total = total;
-            item.order[i].uuid = uuidv4();
-            object.push(item.order[i])
+        try {
+            var object: any = [];
+            const bookRoom = await new ServiceOrdersService().checkvalidateBookRoom(item.bookRoomId);
+            for (let i = 0; i < item.order.length; i++) {
+                const service : any = await new ServiceOrdersService().checkvalidateServive(item.order[i].serviceId);
+                const number = await new ServiceOrdersService().checkvalidateNumberService(item.order[i].number)
+                const total = service[0].price * number;
+                item.order[i].total = total;
+                item.order[i].bookRoomId = item.bookRoomId;
+                item.order[i].uuid = uuidv4();
+                object.push(item.order[i]);
+            }
+            try {
+                const rs = await Repository.create(object);
+                if (rs) {
+                    return Promise.resolve({ messager: "Sucsuess" })     
+                }
+            } catch (error) {
+                return Promise.reject({ messager: "Create Faild " })
+           }
+        } catch (error) {
+            return Promise.reject(error)
         }
-        const rs = await Repository.create(object);
-        if (rs == null) {
-            return Promise.reject({ messager: "Create Faild " })
-        }
-        return Promise.resolve({ messager: "Sucsuess" })
     }
 
 
-    public update = async (id: string, item: []) => {
-        const rs = await Repository.update(id, item);
-        if (rs) {
-            return Promise.resolve({ messager: "Sucsess" })
-
+    public update = async (id: string, item: any) => {
+        try {
+            const bookRoom = await new ServiceOrdersService().checkvalidateBookRoom(item.bookRoomId); 
+            const service : any = await new ServiceOrdersService().checkvalidateServive(item.serviceId);
+            const number = await new ServiceOrdersService().checkvalidateNumberService(item.number)
+            const total = service[0].price * number;
+            item.total = total;
+            const rs = await Repository.update(id, item);
+            try {
+                if (rs) {
+                    return Promise.resolve({ messager: "Sucsess" });
+                }
+                else{
+                    return Promise.reject({ messager: " ServiceOrders Id invalid ! " })
+                }
+            } catch (error) {
+                return Promise.reject({ messager: "Update Faild" })
+            }
+        } catch (error) {
+            return Promise.reject(error)
         }
-        return Promise.reject({ messager: "Update Faild" })
+       
     }
 
     public delete = async (id: string) => {
@@ -57,6 +135,18 @@ export class ServiceOrdersService {
         }
         return Promise.resolve({ result: rs })
     }
+
+    public findServiceByBookroom = async (id: string) => { // tim bookromid do dat cac service nao 
+        const rs = await BillRepo.getInforserviceOrder(id);
+        if (Object.keys(rs).length == 0) {
+            return Promise.reject({ messager: "BookRoom Invalid !" })
+        }
+        else {
+            return Promise.resolve( { result: rs } );
+        }
+        
+    }
+
 
     public findItem = async (item: []) => {
         const rs = await Repository.findItem(item);
