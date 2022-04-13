@@ -96,7 +96,7 @@ class Server {
 
     }
     public start(): void {
-        this.app.listen(4000, () => {
+        this.app.listen(this.PORT, () => {
 
             console.log(`server running at port: ${this.PORT}`);
         });

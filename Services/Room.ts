@@ -1,3 +1,4 @@
+import { AnyARecord } from 'dns';
 import { RoomRepository } from '../Repositories/Repository/Room';
 
 
@@ -14,45 +15,52 @@ export class RoomService {
     }
 
     public create = async (item: []) => {
-        const rs = await Repository.create(item);
-        if (rs == null) {
-            return Promise.reject({ messager: "Create Faild " })
-        }
+        await Repository.create(item);
         return Promise.resolve({ messager: "Sucsuess" })
     }
-
 
     public update = async (id: string, item: []) => {
-        const rs = await Repository.update(id, item);
-        if (rs) {
-            return Promise.resolve({ messager: "Sucsess" })
-
+        const findOne = await Repository.findOne(id);
+        const lengthObject = Object.keys(findOne).length;
+        if (lengthObject == 0) {
+            return Promise.reject({ messager: "Room Data Not Found" });
         }
-        return Promise.reject({ messager: "Update Faild" })
+        else {
+            await Repository.update(id, item);
+            return Promise.resolve({ messager: "Sucsuess" });
+        }
+
     }
-
     public delete = async (id: string) => {
-        const rs = await Repository.delete(id)
-        if (rs == 0) {
-            return Promise.reject({ messager: "Delete Faild" })
+        const findOne = await Repository.findOne(id)
+        if (findOne == false) {
+            return Promise.reject({ messager: "Room Data Not Found" });
         }
-        return Promise.resolve({ messager: "Sucsuess" })
+        else {
+            await Repository.delete(id);
+            return Promise.resolve({ messager: "Sucsuess" });
+        }
+
     }
 
     public findOne = async (id: string) => {
-        const rs = await Repository.findOne(id)
-        if (rs == false) {
-            return Promise.reject({ messager: "Not Found" })
+        const rs = await Repository.findOne(id);
+        const lengthObject = Object.keys(rs).length;
+        if (lengthObject == 0) {
+            return Promise.reject({ messager: "Room Data Not Found" });
         }
-        return Promise.resolve({ result: rs })
+        return Promise.resolve({ result: rs });
     }
+
     public findItem = async (item: []) => {
         const rs = await Repository.findItem(item);
-        if (rs == null) {
-            return Promise.reject({ messager: "Not Found" })
+        const lengthObject = Object.keys(rs).length;
+        if (lengthObject == 0) {
+            return Promise.reject({ messager: "Room Data Not Found" });
         }
-        return Promise.resolve({ result: rs })
+        return Promise.resolve({ result: rs });
     }
+
 
     public checkValidateRoomName = async (item: any) => {
         const rs = await Repository.checkValidateRoomName(item);
@@ -64,7 +72,7 @@ export class RoomService {
 
     public checkPriceValidate = (price: number) => {
         if (price < 0) {
-            return Promise.reject({ messager: "Please enter a valid amount" })
+            return Promise.reject({ messager: "Please enter an amount greater than 0" })
         }
         else {
             return Promise.resolve();
@@ -78,6 +86,26 @@ export class RoomService {
         if (Object.keys(rs).length == 0) {
             return Promise.reject({ messager: "Hotel does not exist" });
         }
+        return Promise.resolve();
+    }
+    public checkValidInput = (name: string, type: any, price: any, status: any, hotelId: any) => {
+        if (name.trim() == null || name.trim() == "" || name == undefined) {
+            return Promise.reject({ message: "Please enter room Name" })
+        }
+        if (type.trim() == null || type.trim() == "") {
+            return Promise.reject({ message: "Please enter Room Type" })
+        }
+        if (price.trim() == null || price.trim() == "") {
+            return Promise.reject({ message: "Please enter price" })
+        }
+        if (isNaN(price)) {
+            return Promise.reject({ message: "Please enter a series of numbers in Price" })
+        }
+
+        if (hotelId.trim() == null || hotelId.trim() == "") {
+            return Promise.reject({ message: "Please select a Hotel" })
+        }
+
         return Promise.resolve();
     }
 

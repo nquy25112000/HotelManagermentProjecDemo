@@ -17,7 +17,7 @@ export class UsersRepository extends KnexRepository<Users> {
             .andWhere('password', '=', pass)
             .select()
     };
-    selectName(user: string): Promise<Users[]> {
+    findUserName(user: string): Promise<Users[]> {
         return knex(this.tableName)
             .where('username', '=', user)
             .select()
@@ -27,4 +27,11 @@ export class UsersRepository extends KnexRepository<Users> {
             .where('username', '=', pass)
             .select()
     };
+
+    checkHotelId(id: string): Promise<any> {
+        return knex("Hotel")
+            .select("Hotel.uuid")
+            .innerJoin("Room", "Room.hotelId", "=", "Hotel.uuid")
+            .where({ hotelId: id })
+    }
 }

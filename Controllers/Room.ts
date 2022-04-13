@@ -7,33 +7,31 @@ const baseController = new BaseController();
 const statusCode = new StatusCode();
 const service = new RoomService();
 
-export class RoomController {
+export class RoomController extends BaseController {
 
 
     public findAll = (req: Request, res: Response, next: NextFunction) => {
 
         service.findAll()
             .then(result => {
-                baseController.sendResponse(result, req, res);
+                this.sendResponse(result, req, res);
             })
-            .catch(err => { res.json(err); });
-
-
-
+            .catch(err => { this.sendResponse(err, req, res.status(400)) });
     }
 
     public create = async (req: Request, res: Response, next: NextFunction) => {
-        const item = req.body;
+        const item = await req.body;
         item.uuid = uuidv4();
         try {
+            await service.checkValidInput(item.name, item.type, item.price, item.status, item.hotelId)
             await service.checkHotelId(item.hotelId);
-            await service.checkPriceValidate(item.price)
-            await service.checkValidateRoomName(item.name)
-            const result = await service.create(item)
-            baseController.sendResponse(result, req, res);
+            await service.checkPriceValidate(item.price);
+            await service.checkValidateRoomName(item.name);
+            const result = await service.create(item);
+            this.sendResponse(result, req, res);
         }
         catch (err) {
-            res.json(err);
+            this.sendResponse(err, req, res.status(400));
         }
 
     }
@@ -47,47 +45,50 @@ export class RoomController {
             await service.checkPriceValidate(item.price)
             await service.checkValidateRoomName(item.name)
             const result = await service.update(id, item)
-            baseController.sendResponse(result, req, res);
+            this.sendResponse(result, req, res);
         }
         catch (err) {
-            res.json(err)
+            this.sendResponse(err, req, res.status(400))
         }
     }
 
-    public findOne = (req: Request, res: Response, next: NextFunction) => {
-        const item = req.body;
+    public findOne = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.params.id;
-        service.findOne(id)
-            .then(result => {
-                baseController.sendResponse(result, req, res);
-            })
-            .catch(err => { res.json(err); });
+        try {
+            const result = await service.findOne(id)
+            this.sendResponse(result, req, res)
+        } catch (error) {
+            this.sendResponse(error, req, res.status(400))
+        }
     }
-    public findItem = (req: Request, res: Response, next: NextFunction) => {
+
+    public findItem = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        service.findItem(item)
-            .then(result => {
-                baseController.sendResponse(result, req, res);
-            })
-            .catch(err => { res.json(err); });
+        try {
+            const result = await service.findItem(item);
+            this.sendResponse(result, req, res);
+        } catch (error) {
+            this.sendResponse(error, req, res.status(400))
+        }
 
     }
 
-    public delete = (req: Request, res: Response, next: NextFunction) => {
+    public delete = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.params.id;
-        service.delete(id)
-            .then(result => {
-                baseController.sendResponse(result, req, res);
-            })
-            .catch(err => { res.json(err); });
+        try {
+            const result = await service.delete(id);
+            this.sendResponse(result, req, res);
+        } catch (error) {
+            this.sendResponse(error, req, res.status(400))
+        }
 
     }
 
     public check = (req: Request, res: Response, next: NextFunction) => {
         const name = req.body.name;
         service.checkValidateRoomName(name)
-            .then(rs => { res.json(rs); })
-            .catch(err => res.json(err));
+            .then(rs => { this.sendResponse(rs, req, res.status(200)); })
+            .catch(err => this.sendResponse(err, req, res.status(400)));
     }
 }
 
