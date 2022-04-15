@@ -9,7 +9,7 @@ export class TokenRepository {
             .insert(item)
     }
 
-    findOne(token: string): Promise<any> {
+    findToKenCode(token: string): Promise<any> {
         return knex("Token")
             .select()
             .where({ tokenCode: token })
@@ -18,14 +18,13 @@ export class TokenRepository {
     findJoin(token: string): Promise<any> {
         return knex.table('Role')
             .select("Role.name")
-            .innerJoin("Users", "Users.roleId", "=", "Role.uuid")
-            .innerJoin("Token", "Token.userId", "=", "Users.uuid")
-            .where("Token.tokenCode", "=", token)
-
-
-
-        // .andWhere("Users.roleId", "=", "Role.uuid")
-
-        // .andWhere()
+            .innerJoin("Users", "Users.roleId", "=", "Role.id")
+            .innerJoin("Token", "Token.userId", "=", "Users.id")
+            .where({ tokenCode: token })
+    }
+    updateWhereToken(token: string, time: any): Promise<any> {
+        return knex.table("Token")
+            .update({ timeExpire: time })
+            .where({ tokenCode: token })
     }
 }

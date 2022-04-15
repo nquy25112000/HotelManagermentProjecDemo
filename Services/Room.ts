@@ -1,8 +1,13 @@
 import { AnyARecord } from 'dns';
+import { BookRoomRepository } from '../Repositories/Repository/BookRoom';
+import { HotelRepository } from '../Repositories/Repository/Hotel';
+import { RoleRepository } from '../Repositories/Repository/Role';
 import { RoomRepository } from '../Repositories/Repository/Room';
 
-
 const Repository = new RoomRepository();
+const hotelRepository = new HotelRepository();
+const roleRepository = new RoleRepository();
+const bookRoomRepository = new BookRoomRepository();
 
 
 export class RoomService {
@@ -37,6 +42,11 @@ export class RoomService {
             return Promise.reject({ messager: "Room Data Not Found" });
         }
         else {
+            const findRoomId = await bookRoomRepository.findRoomId(id);
+            const lengthObject = Object.keys(findRoomId).length
+            if (lengthObject > 0) {
+                return Promise.reject({ messager: "This room contains some booking data, Please clear the reservation data before deleting the Room" })
+            }
             await Repository.delete(id);
             return Promise.resolve({ messager: "Sucsuess" });
         }

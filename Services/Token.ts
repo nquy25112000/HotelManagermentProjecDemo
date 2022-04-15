@@ -15,7 +15,7 @@ export class TokenService {
         const newDate = today.getTime() + 10800000; //cộng 3 tiếng, nhưng cộng mili giây
         const date = new Date(newDate);
         const item = {
-            uuid: uuidv4(),
+            id: uuidv4(),
             tokenCode: accesToken,
             userId: userId,
             timeExpire: date
@@ -35,16 +35,55 @@ export class TokenService {
         if (token == undefined) {
             return Promise.reject({ messager: "Need verification code" });
         }
-        const findOne = await repository.findOne(token)
-        if (Object.keys(findOne).length == 0) {
+        const findToken = await repository.findToKenCode(token)
+        if (Object.keys(findToken).length == 0) {
             return Promise.reject({ messager: "Invalid verification code" });
         }
-        return Promise.resolve(findOne);
+        else { //ngược lại nếu có dữ liệu token đó thì dùng token đó và update thêm time cho token đó
+            const today = new Date();
+
+            const MilisecondTodate = today.getTime();
+            const milisecondTimeExpire = await findToken[0].timeExpire.getTime();
+            if (MilisecondTodate > milisecondTimeExpire) {
+                return Promise.reject({ messager: "Session has expired, please login again" });
+            }
+
+            const newMilisecondTimeExpire = MilisecondTodate + 10800000; //cộng 3 tiếng, nhưng cộng mili giây
+            const date = new Date(newMilisecondTimeExpire);
+            await repository.updateWhereToken(token, date);
+            return Promise.resolve();
+        }
+
     }
-    public checkRoleToken = async (token: any) => {
+
+    public RoleRootAndAdmin = async (token: any) => {
+        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const roleName = result[0].name;
+        if (roleName == "Root" || roleName == "Admin") {
+            return Promise.resolve();
+        }
+        return Promise.reject({ messager: "You Forbidden" });
+    }
+    public RoleAdminAndUser = async (token: any) => {
+        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const roleName = result[0].name;
+        if (roleName == "Admin" || roleName == "User") {
+            return Promise.resolve();
+        }
+        return Promise.reject({ messager: "You Forbidden" });
+    }
+    public RoleRoot = async (token: any) => {
         const result = await repository.findJoin(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Root") {
+            return Promise.resolve();
+        }
+        return Promise.reject({ messager: "You Forbidden" });
+    }
+    public RoleAdmin = async (token: any) => {
+        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const roleName = result[0].name;
+        if (roleName == "Admin") {
             return Promise.resolve();
         }
         return Promise.reject({ messager: "You Forbidden" });

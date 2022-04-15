@@ -23,7 +23,7 @@ export class UsersRouter {
 
         this.Router.get('/acount', Controller.selectAcount);
 
-        this.Router.post('/findItem', Controller.findItem);
+        this.Router.get('/findItem', Controller.findItem);
 
         this.Router.post('/create', Controller.create);
         this.Router.put('/update/:id', Controller.update);

@@ -18,32 +18,43 @@ export class TokenController extends BaseController {
         }
     }
 
-    public authorization = (req: Request, res: Response, next: NextFunction) => {
+    // public authorization = (req: Request, res: Response, next: NextFunction) => {
+    //     let author = req.headers['authorization'];
+    //     const token = author?.split(" ")[1];
+    //     service.checkToken(token)
+    //         .then(result => {
+    //             if (result) {
+    //                 const time = result[0].timeExpire;
+    //                 service.checkTimeToken(time)
+    //                     .then(() => {
+    //                         next();
+    //                     })
+    //                     .catch(err => { res.json(err) })
+    //             }
+    //         })
+    //         .catch(err => { res.json(err) })
+    // }
+    public authorization = async (req: Request, res: Response, next: NextFunction) => {
         let author = req.headers['authorization'];
         const token = author?.split(" ")[1];
-        service.checkToken(token)
-            .then(result => {
-                if (result) {
-                    const time = result[0].timeExpire;
-                    service.checkTimeToken(time)
-                        .then(() => {
-                            next();
-                        })
-                        .catch(err => { res.json(err) })
-                }
-            })
-            .catch(err => { res.json(err) })
+        try {
+            await service.checkToken(token);
+            next();
+        } catch (error) {
+            res.status(401).json(error)
+        }
+
     }
 
     public RoleRoot = (req: Request, res: Response, next: NextFunction) => {
         const author = req.headers['authorization'];
         const token = author?.split(" ")[1];
-        service.checkRoleToken(token)
+        service.RoleRoot(token)
             .then(() => {
                 next();
             })
             .catch((err) => {
-                res.json(err)
+                res.status(403).json(err)
             })
 
     }

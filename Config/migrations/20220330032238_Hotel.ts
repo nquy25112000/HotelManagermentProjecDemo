@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+import { v4 as uuidv4 } from 'uuid';
 
 
 export async function up(knex: Knex): Promise<void> {
@@ -116,6 +117,16 @@ export async function up(knex: Knex): Promise<void> {
             table.specificType('bookRoomId', 'CHAR(36)').notNullable();
             table.foreign('bookRoomId').references('id').inTable('BookRoom');
         })
+        .then(async () => {
+            const id = uuidv4();
+            await knex("Role").insert([
+                { id: id, name: "Root" }
+            ])
+
+            await knex.schema.raw(`INSERT INTO Users(id, username, password, roleId) VALUES ('${id}','a', 'b' , (SELECT id FROM Role where name = 'Root'))`);
+
+        })
+
 
 
 }

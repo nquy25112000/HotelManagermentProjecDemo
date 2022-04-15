@@ -22,7 +22,7 @@ export class UsersController extends BaseController {
 
     public create = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        item.uuid = uuidv4();
+        item.id = uuidv4();
         try {
             await service.checkValidInput(item.username, item.password, item.fullName, item.birtDate, item.adress, item.phone, item.hotelId, item.roleId);
             await service.checkHotelId(item.hotelId);
@@ -40,12 +40,14 @@ export class UsersController extends BaseController {
 
     public update = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        const id = item.id;
+        const id = req.params.id;
         try {
             await service.checkValidInput(item.username, item.password, item.fullName, item.birtDate, item.adress, item.phone, item.hotelId, item.roleId);
             await service.checkHotelId(item.hotelId);
             await service.checkRoleId(item.roleId);
             await service.checkUserName(item.username);
+            await service.checkValidCharactersUsername(item.username);
+            await service.checkValidCharactersFullName(item.fullName);
             const result = await service.update(id, item);
             baseController.sendResponse(result, req, res.status(200));
         } catch (error) {
