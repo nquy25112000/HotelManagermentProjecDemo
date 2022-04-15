@@ -1,4 +1,5 @@
 import { UsersService } from '../Services/Users'
+import { TokenService } from '../Services/Token'
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { StatusCode } from './StatusCode';
@@ -6,6 +7,7 @@ import { BaseController } from './BaseController';
 
 const statusCode = new StatusCode();
 const service = new UsersService();
+const tokenService = new TokenService();
 const baseController = new BaseController();
 
 export class UsersController extends BaseController {
@@ -22,9 +24,13 @@ export class UsersController extends BaseController {
 
     public create = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
+        item.hotelId = HotelId;
         item.id = uuidv4();
+
         try {
-            await service.checkValidInput(item.username, item.password, item.fullName, item.birtDate, item.adress, item.phone, item.hotelId, item.roleId);
+            await service.checkValidInput(item.username, item.password, item.fullName, item.birtDate, item.adress, item.phone, item.hotelId, item.hotelId);
             await service.checkHotelId(item.hotelId);
             await service.checkRoleId(item.roleId);
             await service.checkUserName(item.username);
@@ -41,6 +47,9 @@ export class UsersController extends BaseController {
     public update = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
         const id = req.params.id;
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
+        item.hotelId = HotelId;
         try {
             await service.checkValidInput(item.username, item.password, item.fullName, item.birtDate, item.adress, item.phone, item.hotelId, item.roleId);
             await service.checkHotelId(item.hotelId);

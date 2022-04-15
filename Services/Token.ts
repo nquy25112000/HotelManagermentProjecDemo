@@ -22,7 +22,7 @@ export class TokenService {
         }
         const rs = await repository.create(item);
         if (rs) {
-            const checkRole = await repository.findJoin(accesToken);
+            const checkRole = await repository.findRole(accesToken);
             const role = checkRole[0].name;
             return Promise.resolve({ messager: "Sucsess", Token: accesToken, role: role })
         }
@@ -30,7 +30,11 @@ export class TokenService {
 
     }
 
-
+    public findHotelIdWhereToken = async (token: any) => {
+        const rs = await repository.findHoteIdlWhereToken(token);
+        const hotelId = rs[0].id;
+        return Promise.resolve(hotelId);
+    }
     public checkToken = async (token: any) => {
         if (token == undefined) {
             return Promise.reject({ messager: "Need verification code" });
@@ -57,7 +61,7 @@ export class TokenService {
     }
 
     public RoleRootAndAdmin = async (token: any) => {
-        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const result = await repository.findRole(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Root" || roleName == "Admin") {
             return Promise.resolve();
@@ -65,7 +69,7 @@ export class TokenService {
         return Promise.reject({ messager: "You Forbidden" });
     }
     public RoleAdminAndUser = async (token: any) => {
-        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const result = await repository.findRole(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Admin" || roleName == "User") {
             return Promise.resolve();
@@ -73,7 +77,7 @@ export class TokenService {
         return Promise.reject({ messager: "You Forbidden" });
     }
     public RoleRoot = async (token: any) => {
-        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const result = await repository.findRole(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Root") {
             return Promise.resolve();
@@ -81,7 +85,7 @@ export class TokenService {
         return Promise.reject({ messager: "You Forbidden" });
     }
     public RoleAdmin = async (token: any) => {
-        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const result = await repository.findRole(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Admin") {
             return Promise.resolve();
