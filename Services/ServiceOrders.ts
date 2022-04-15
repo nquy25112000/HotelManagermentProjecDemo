@@ -79,12 +79,12 @@ export class ServiceOrdersService {
                 const total = service[0].price * number;
                 item.order[i].total = total;
                 item.order[i].bookRoomId = item.bookRoomId;
-                item.order[i].uuid = uuidv4();
+                item.order[i].id = uuidv4();
                 object.push(item.order[i]);
             }
             try {
                 const rs = await Repository.create(object);
-                if (rs) {
+                if (rs) { //=> >(1) [0] 
                     return Promise.resolve({ messager: "Sucsuess" })     
                 }
             } catch (error) {
@@ -103,13 +103,13 @@ export class ServiceOrdersService {
             const number = await new ServiceOrdersService().checkvalidateNumberService(item.number)
             const total = service[0].price * number;
             item.total = total;
-            const rs = await Repository.update(id, item);
             try {
+                const rs = await Repository.update(id, item);
                 if (rs) {
                     return Promise.resolve({ messager: "Sucsess" });
                 }
                 else{
-                    return Promise.reject({ messager: " ServiceOrders Id invalid ! " })
+                    return Promise.reject({ messager: " ServiceOrders Id not exists ! " })
                 }
             } catch (error) {
                 return Promise.reject({ messager: "Update Faild" })
@@ -121,11 +121,11 @@ export class ServiceOrdersService {
     }
 
     public delete = async (id: string) => {
-        const rs = await Repository.delete(id)
+        const rs = await Repository.delete(id);
         if (rs == 0) {
-            return Promise.reject({ messager: "Delete Faild" })
+            return Promise.reject({ messager: "Delete Faild" });
         }
-        return Promise.resolve({ messager: "Sucsuess" })
+        return Promise.resolve({ messager: "Sucsuess" });
     }
 
     public findOne = async (id: string) => {

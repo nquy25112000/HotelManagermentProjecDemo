@@ -30,29 +30,33 @@ export class BillService {
             inforBookroom[0].hours = hours;
             return {price, inforBookroom};
        } catch (error) {
-            return error;
+            return Promise.reject({ messager: " BookRoom not exists ! " } );
        } 
     }
     public create = async (item: any) => {
         try {
-            const totalService : any = await ServiceOrdersRepo.totalService(item.bookRoomId); // sum total service
             const {price, inforBookroom} : any = await new BillService().getBookroomdAndPrice(item.bookRoomId);
-            const inforUser : any = await userRepo.findOne(inforBookroom[0].userId); // Property '0' does not exist on type 'Boolean'
-            const inforServiceOder = await   Repository.getInforserviceOrder(item.bookRoomId)
-            const totalBill = totalService[0].sum + price; // console.log(total[0].sum); // 0:RowDataPacket {sum: 40000}
-            item.total = totalBill;
-            const rs = await Repository.create(item);
-            if(rs) {
-                return Promise.resolve({
-                messager : "Sucsuess",
-                inforBookroom : inforBookroom , 
-                inforServiceOder : inforServiceOder,
-                inforUser : inforUser[0].fullName,
-                totalBill : totalBill
-            })
+            try {
+                const totalService : any = await ServiceOrdersRepo.totalService(item.bookRoomId); // sum total service        
+                const inforUser : any = await userRepo.findOne(inforBookroom[0].userId); // Property '0' does not exist on type 'Boolean'
+                const inforServiceOder = await   Repository.getInforserviceOrder(item.bookRoomId)
+                const totalBill = totalService[0].sum + price; // console.log(total[0].sum); // 0:RowDataPacket {sum: 40000}
+                item.total = totalBill;
+                const rs = await Repository.create(item);
+                if(rs) {
+                    return Promise.resolve({
+                    messager : "Sucsuess",
+                    inforBookroom : inforBookroom , 
+                    inforServiceOder : inforServiceOder,
+                    inforUser : inforUser[0].fullName,
+                    totalBill : totalBill
+                })
+                }
+            } catch (error) {
+                return Promise.reject({messager : "Create Faild "});
             }
         } catch (error) {
-            return Promise.reject({messager : "Create Faild "})
+            return Promise.reject(error);
         }
         
     }
@@ -75,6 +79,9 @@ export class BillService {
     public findOne = async (id: string) => {
         try {
             const rs : any = await Repository.findOne(id);
+            if (Object.keys(rs).length == 0) {
+                return Promise.reject({ messager: " Bill not exists ! "  });
+            }
             const {price, inforBookroom} : any = await new BillService().getBookroomdAndPrice(rs[0].bookRoomId);
             const inforUser : any = await userRepo.findOne(inforBookroom[0].userId); // Property '0' does not exist on type 'Boolean'
             const inforServiceOder : any = await   Repository.getInforserviceOrder(rs[0].bookRoomId)
@@ -90,6 +97,8 @@ export class BillService {
             return Promise.reject({messager :"Not Found"} )
         }
     }
+
+
     public findItem = async (item: []) => {
         const rs = await Repository.findItem(item);
         if (rs == null) {

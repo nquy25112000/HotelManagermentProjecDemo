@@ -39,24 +39,40 @@ export class HotelService {
 
 
     public create = async (item: any) => {
-        console.log(item.name);
-        const ob = await new HotelService().checkvalidateHotel(item);
-        const rs = await Repository.create(item);
-        if (rs == null) {
-            return Promise.reject({messager : "Create Faild "})
+        try {
+            const ob = await new HotelService().checkvalidateHotel(item);
+            try {
+                const rs = await Repository.create(item);
+                if (rs) {
+                    return Promise.resolve({messager : "Sucsuess"});           
+                }
+            } catch (error) {
+                return Promise.reject({messager : "Create Faild "});
+            }
+        } catch (error) {
+            return Promise.reject(error);
         }
-        return Promise.resolve({messager : "Sucsuess"})
     }
     public update = async (id: string, item: []) => {
-        const rs = await Repository.update(id, item);
-        if (rs) {
-            return Promise.resolve({ messager: "Sucsess" })
-           
-        }
-        return Promise.reject({ messager: "Update Faild" })
+       try {
+            const ob = await new HotelService().checkvalidateHotel(item);
+            try {
+                const rs = await Repository.update(id, item);
+                if (rs) {  // rs = 1
+                    return Promise.resolve({ messager: "Sucsess" });          
+                }      
+                else{
+                    return Promise.reject({ messager: " Hotel Id not exists ! " })
+                }     
+            } catch (error) {
+                return Promise.reject({ messager: "Update Faild" });
+            }
+       } catch (error) {
+            return Promise.reject(error);
+       }
     }
     public delete = async (id: string) => {
-        const rs = await Repository.delete(id)
+        const rs = await Repository.delete(id);
         if (rs == 0) {
             return Promise.reject({ messager: "Delete Faild" })
         }
