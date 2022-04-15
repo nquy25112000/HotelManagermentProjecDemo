@@ -16,7 +16,7 @@ export class ServiceOrdersController {
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })
-            .catch(err => { res.json(err); });
+            .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
 
 
 
@@ -38,7 +38,7 @@ export class ServiceOrdersController {
             const rs = await service.create(item);
             baseController.sendResponse(rs, req, res);
         } catch (error) {
-            baseController.sendResponse(error, req, res.status(404));
+            baseController.sendResponse(error, req, res.status(500));
         }
     }
 
@@ -50,7 +50,7 @@ export class ServiceOrdersController {
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })
-            .catch(err => { baseController.sendResponse(err, req, res.status(404)); });
+            .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
     }
 
     public findOne = (req: Request, res: Response, next: NextFunction) => {
@@ -60,7 +60,7 @@ export class ServiceOrdersController {
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })
-            .catch(err => { res.json(err); });
+            .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
     }
     public findItem = (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
@@ -68,7 +68,7 @@ export class ServiceOrdersController {
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })
-            .catch(err => { res.json(err); });
+            .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
 
     }
 
@@ -78,7 +78,7 @@ export class ServiceOrdersController {
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })
-            .catch(err => { res.json(err); });
+            .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
 
     }
 }
