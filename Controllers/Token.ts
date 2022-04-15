@@ -49,7 +49,7 @@ export class TokenController extends BaseController {
     public RoleRoot = (req: Request, res: Response, next: NextFunction) => {
         const author = req.headers['authorization'];
         const token = author?.split(" ")[1];
-        service.RoleRoot(token)
+        service.RoleRootAndAdmin(token)
             .then(() => {
                 next();
             })
