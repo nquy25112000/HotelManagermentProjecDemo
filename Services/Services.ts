@@ -32,20 +32,6 @@ export class ServicesService {
         return Promise.resolve({ result: rs })
     }
 
-<<<<<<< HEAD
-    public create = async (item: []) => {
-        const rs = await Repository.create(item);
-        if (rs == null) {
-            return Promise.reject({ messager: "Create Faild " })
-        }
-        return Promise.resolve({ messager: "Sucsuess" })
-    }
-    public update = async (id: string, item: []) => {
-        const rs = await Repository.update(id, item);
-        if (rs) {
-            return Promise.resolve({ messager: "Sucsess" })
-
-=======
     public create = async (item: any) => {
        try {
            const checkservice = await new ServicesService().checkvalidateService(item);
@@ -77,7 +63,6 @@ export class ServicesService {
             }
         } catch (error) {
             return Promise.reject(error);
->>>>>>> truong
         }
       
     }

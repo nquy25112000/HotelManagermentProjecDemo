@@ -5,7 +5,7 @@ export class Connect {
             host: 'localhost',
             user: 'root',
             password: '',
-            database: 'HotelManagerment',
+            database: 'hotel',
             charset: 'utf8'
         }
     })
