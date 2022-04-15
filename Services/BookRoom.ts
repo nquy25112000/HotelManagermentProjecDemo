@@ -67,14 +67,14 @@ export class BookRoomService {
 
 
 
-    public checkTimeFromDate = async (RoomId: any, date: any) => {
+    public checkTimeFromDateToCreate = async (RoomId: any, date: any) => {
         const dateNow = new Date().getTime();
         const fromDate = new Date(date).getTime();
         if (fromDate < dateNow) {
             return Promise.reject({ messager: "The reservation date cannot be less than the current date" })
         }
         else {
-            const findRoomId = await Repository.findRoomIdAndFromDateToDate(RoomId, date);
+            const findRoomId = await Repository.findRoomIdAndFromDateToDateToCreate(RoomId, date);
             const lengthObject = Object.keys(findRoomId).length;
             if (lengthObject > 0) {
                 const fromDateOfObject = findRoomId[0].fromDate
@@ -85,14 +85,14 @@ export class BookRoomService {
         }
     }
 
-    public checkTimeToDate = async (Fdate: any, Tdate: any, RoomId: any) => {
+    public checkTimeToDateToCreate = async (Fdate: any, Tdate: any, RoomId: any) => {
         const fromDate = new Date(Fdate).getTime();
         const toDate = new Date(Tdate).getTime();
         if (toDate < fromDate) {
             return Promise.reject({ messager: "Payment date must not be less than reservation date" })
         }
         else {
-            const findRoomId = await Repository.findRoomIdAndFromDateToDate(RoomId, Tdate);
+            const findRoomId = await Repository.findRoomIdAndFromDateToDateToCreate(RoomId, Tdate);
             const lengthObject = Object.keys(findRoomId).length;
             if (lengthObject > 0) {
                 const fromDateOfObject = findRoomId[0].fromDate
@@ -100,8 +100,44 @@ export class BookRoomService {
             }
             return Promise.resolve();
         }
-
     }
+
+
+    public checkTimeFromDateToUpdate = async (RoomId: any, date: any , id: any) => {
+        const dateNow = new Date().getTime();
+        const fromDate = new Date(date).getTime();
+        if (fromDate < dateNow) {
+            return Promise.reject({ messager: "The reservation date cannot be less than the current date" })
+        }
+        else {
+            const findRoomId = await Repository.findRoomIdAndFromDateToDateToUpDate(RoomId, date , id);
+            const lengthObject = Object.keys(findRoomId).length;
+            if (lengthObject > 0) {
+                const fromDateOfObject = findRoomId[0].fromDate
+                return Promise.reject({ messager: `Someone made a reservation on ${fromDateOfObject}` })
+            }
+            return Promise.resolve();
+
+        }
+    }
+
+    public checkTimeToDateToUpdate = async (Fdate: any, Tdate: any, RoomId: any , id: any) => {
+        const fromDate = new Date(Fdate).getTime();
+        const toDate = new Date(Tdate).getTime();
+        if (toDate < fromDate) {
+            return Promise.reject({ messager: "Payment date must not be less than reservation date" })
+        }
+        else {
+            const findRoomId = await Repository.findRoomIdAndFromDateToDateToUpDate(RoomId, Tdate , id);
+            const lengthObject = Object.keys(findRoomId).length;
+            if (lengthObject > 0) {
+                const fromDateOfObject = findRoomId[0].fromDate
+                return Promise.reject({ messager: `Someone made a reservation on ${fromDateOfObject} , Please select a check-out date before ${fromDateOfObject}` });
+            }
+            return Promise.resolve();
+        }
+    }
+
     public checkInput = (customerName: string, customerIdCard: any, fromDate: any, toDate: any, roomId: any, userId: any) => {
         if (customerName.trim() == null || customerName.trim() == "") {
             return Promise.reject({ message: "Please enter Customer Name" })

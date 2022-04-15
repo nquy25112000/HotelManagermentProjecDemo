@@ -17,8 +17,8 @@ export class RoomRepository extends KnexRepository<Room> {
     }
     checkHotelId(id: string): Promise<any> {
         return knex("Hotel")
-            .select("Hotel.uuid")
-            .innerJoin("Room", "Room.hotelId", "=", "Hotel.uuid")
+            .select("Hotel.id")
+            .innerJoin("Room", "Room.hotelId", "=", "Hotel.id")
             .where({ hotelId: id })
     }
 }

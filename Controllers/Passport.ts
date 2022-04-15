@@ -7,7 +7,7 @@ declare global {
     namespace Express {
         interface AuthInfo { }
         interface User {
-            uuid: any
+            id: any
         }
     }
 }
@@ -43,7 +43,7 @@ export class Passport {
 
             if (!user) return res.status(401).json({ message: "Wrong login information" });
             else {
-                req.user = user[0].uuid
+                req.user = user[0].id
                 next();
             }
 

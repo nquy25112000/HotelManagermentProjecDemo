@@ -50,7 +50,7 @@ export class UsersService {
                 await Repository.delete(id);
                 return Promise.resolve({ messager: "Sucsuess" });
             }
-            return Promise.reject({ messager: "This user is managing some booking data , Please delete the reservation data before deleting the user" })
+            return Promise.reject({ messager: "This room contains some booking data, Please clear the reservation data before deleting the Room" })
 
         }
 

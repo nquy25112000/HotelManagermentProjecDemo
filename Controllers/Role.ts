@@ -23,7 +23,7 @@ export class RoleController {
 
     public create =  (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        item.uuid = uuidv4();
+        item.id = uuidv4();
         service.create(item)
         .then(result => {
             baseController.sendResponse(result, req, res);

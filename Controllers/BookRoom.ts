@@ -13,9 +13,9 @@ export class BookRoomController extends BaseController {
     public findAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const result = await service.findAll()
-            this.sendResponse(result, req, res);
+            this.sendResponse(result, req, res.status(200));
         } catch (error) {
-            this.sendResponse(error, req, res);
+            this.sendResponse(error, req, res.status(400));
         }
 
 
@@ -24,18 +24,18 @@ export class BookRoomController extends BaseController {
 
     public create = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
-        item.uuid = uuidv4();
+        item.id = uuidv4();
         try {
             await service.checkInput(item.customerName, item.customerIdCard, item.fromDate, item.toDate, item.roomId, item.userId)
             await service.checkUserId(item.userId)
             await service.checkRoomId(item.roomId)
-            await service.checkTimeFromDate(item.roomId, item.fromDate);
-            await service.checkTimeToDate(item.fromDate, item.toDate, item.roomId);
+            await service.checkTimeFromDateToCreate(item.roomId, item.fromDate);
+            await service.checkTimeToDateToCreate(item.fromDate, item.toDate, item.roomId);
             const result = await service.create(item)
-            this.sendResponse(result, req, res)
+            this.sendResponse(result, req, res.status(200))
         }
         catch (err) {
-            this.sendResponse(err, req, res)
+            this.sendResponse(err, req, res.status(400))
         }
 
 
@@ -49,13 +49,13 @@ export class BookRoomController extends BaseController {
             await service.checkInput(item.customerName, item.customerIdCard, item.fromDate, item.toDate, item.roomId, item.userId)
             await service.checkUserId(item.userId)
             await service.checkRoomId(item.roomId)
-            await service.checkTimeFromDate(item.roomId, item.fromDate);
-            await service.checkTimeToDate(item.fromDate, item.toDate, item.roomId);
+            await service.checkTimeFromDateToUpdate(item.roomId, item.fromDate, id);
+            await service.checkTimeToDateToUpdate(item.fromDate, item.toDate, item.roomId, id);
             const result = await service.update(id, item);
-            this.sendResponse(result, req, res);
+            this.sendResponse(result, req, res.status(200));
         }
         catch (error) {
-            this.sendResponse(error, req, res)
+            this.sendResponse(error, req, res.status(400))
         }
     }
 
@@ -63,9 +63,9 @@ export class BookRoomController extends BaseController {
         const id = req.params.id;
         try {
             const result = await service.findOne(id)
-            this.sendResponse(result, req, res)
+            this.sendResponse(result, req, res.status(200))
         } catch (error) {
-            this.sendResponse(error, req, res)
+            this.sendResponse(error, req, res.status(400))
         }
     }
 
@@ -73,9 +73,9 @@ export class BookRoomController extends BaseController {
         const item = req.body;
         try {
             const result = await service.findItem(item);
-            this.sendResponse(result, req, res);
+            this.sendResponse(result, req, res.status(200));
         } catch (error) {
-            this.sendResponse(error, req, res)
+            this.sendResponse(error, req, res.status(400))
         }
 
 
@@ -86,9 +86,9 @@ export class BookRoomController extends BaseController {
         const id = req.params.id;
         try {
             const result = await service.delete(id);
-            this.sendResponse(result, req, res);
+            this.sendResponse(result, req, res.status(200));
         } catch (error) {
-            this.sendResponse(error, req, res)
+            this.sendResponse(error, req, res.status(400))
         }
 
     }
