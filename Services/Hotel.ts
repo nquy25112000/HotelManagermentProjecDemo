@@ -1,7 +1,12 @@
 import { HotelRepository } from '../Repositories/Repository/Hotel';
+import {UsersRepository} from '../Repositories/Repository/Users';
+import {RoleRepository} from '../Repositories/Repository/Role';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const Repository = new HotelRepository();
+const UserRepo = new UsersRepository();
+const RoleRepo = new RoleRepository()
 
 
 export class HotelService {
@@ -16,10 +21,6 @@ export class HotelService {
     public checkvalidateHotel  = async (item : any) => {
         if(typeof item.name === "undefined" || !item.name ){
             return Promise.reject({ messager: "Name Invalid !" });
-        }
-        const name = await Repository.checkNameHotel(item.name);
-        if (Object.keys(name).length > 0) {
-            return Promise.reject({ messager: "Name already exists !" });
         }
         if(!item.adress  || typeof item.adress === "undefined" ){
             return Promise.reject({ messager: "Adress Invalid !" });
@@ -37,14 +38,51 @@ export class HotelService {
         }
     }
 
+    public checkvalidateNameHotelCreate = async (name : string) => {
+        const nameHotel = await Repository.checkNameHotelCreate(name);
+        if (Object.keys(nameHotel).length > 0) {
+            return Promise.reject({ messager: "Name already exists !" });
+        }
+    }
+
+    public checkvalidateNameHotelUpdate = async (id : string ,name : string) => {
+        const nameHotel = await Repository.checkNameHotelUpdate(id, name);
+        if (Object.keys(nameHotel).length > 0) {
+            return Promise.reject({ messager: "Name already exists !" });
+        }
+    }
+
+
+    public createUser = async (idHotel: any) => {   
+        try {
+            const idRoleAdmin = await RoleRepo.findIdbyNameAdmin();
+            const iduser = uuidv4();
+            const user : any =  {id:  `${iduser}`  , fullName : 'admin', username: 'admin',password : 'admin' , birtDate : '', adress : '', phone : '', hotelId : `${idHotel}` , roleId :   `${idRoleAdmin[0].id}` };
+            const rs = await UserRepo.create(user);
+            if (rs) {
+                return Promise.resolve(iduser);           
+            }
+        } catch (error) {
+            return Promise.reject({messager : "Create User Faild "});
+        }
+    }
 
     public create = async (item: any) => {
         try {
             const ob = await new HotelService().checkvalidateHotel(item);
+            await  new HotelService().checkvalidateNameHotelCreate(item.name);
             try {
                 const rs = await Repository.create(item);
+                var idUser : any = await new HotelService().createUser(item.id);
                 if (rs) {
-                    return Promise.resolve({messager : "Sucsuess"});           
+                    const hotel = await Repository.findOne(item.id);
+                    const user = await Repository.inforUser(idUser);
+                   
+                    return Promise.resolve({
+                        messager : "Sucsuess", 
+                        inforHotel :  hotel,
+                        inforUser : user
+                    });           
                 }
             } catch (error) {
                 return Promise.reject({messager : "Create Faild "});
@@ -53,13 +91,18 @@ export class HotelService {
             return Promise.reject(error);
         }
     }
-    public update = async (id: string, item: []) => {
+    public update = async (id: string, item: any) => {
        try {
-            const ob = await new HotelService().checkvalidateHotel(item);
+            await new HotelService().checkvalidateHotel(item);
+            await  new HotelService().checkvalidateNameHotelUpdate(id, item.name);
             try {
                 const rs = await Repository.update(id, item);
                 if (rs) {  // rs = 1
-                    return Promise.resolve({ messager: "Sucsess" });          
+                    const hotel : any = await Repository.findOne(id);
+                    return Promise.resolve({ 
+                        messager: "Sucsess" , 
+                        inforHotel :  hotel[0]
+                    });          
                 }      
                 else{
                     return Promise.reject({ messager: " Hotel Id not exists ! " })
@@ -72,11 +115,15 @@ export class HotelService {
        }
     }
     public delete = async (id: string) => {
-        const rs = await Repository.delete(id);
-        if (rs == 0) {
-            return Promise.reject({ messager: "Delete Faild" })
-        }
-        return Promise.resolve({messager : "Sucsuess"})
+       try {
+            const rs = await Repository.delete(id);
+            if (rs == 0) {
+                return Promise.reject({ messager: "Delete Faild" })
+            }
+            return Promise.resolve({messager : "Sucsuess"})
+       } catch (error) {
+        return Promise.reject({ messager: "Error Delete !!" }) /// error k xoa dc vi lien ket voi User
+       }
     }
 
     public findOne = async (id: string) => {

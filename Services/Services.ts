@@ -9,23 +9,35 @@ export class ServicesService {
     public checkvalidateService  = async (item : any) => {
         if(typeof item.name === "undefined" || !item.name ){
             return Promise.reject({ messager: "Name Invalid !" });
-        }
-        const name = await Repository.checkNameService(item.name);
-        if (Object.keys(name).length > 0) {
-            return Promise.reject({ messager: "Name already exists !" });
-        }
-        if( typeof item.price === "string" || typeof item.price === "undefined" || !item.price || item.price  < 1){
+        }       
+        if(  typeof item.price === "undefined" || !item.price || item.price  < 1){
             return Promise.reject({ messager: "Price Invalid !" });
+        }
+        if( typeof item.hotelId === "undefined" ){
+            return Promise.reject({ messager: "Hotel undefined !" });
         }
         const hotel = await HotelRepo.findOne(item.hotelId);
         if (hotel == false) {
             return Promise.reject({ messager: "Hotel not exists !" });
-        }
-        
+        }      
     }
 
-    public findAll = async () => {
-        const rs = await Repository.findAll();
+    public checkvalidateNameServiceCreate = async (name : string , hotelId : string) => {
+        const nameService = await Repository.checkNameServiceCreate(name, hotelId) ;
+        if (Object.keys(nameService).length > 0) {
+            return Promise.reject({ messager: "Name already exists !" });
+        }
+    }
+
+    public checkvalidateNameServiceUpdate = async (id : string ,name : string, hotelId : string) => {
+        const nameService = await Repository.checkNameServiceUpdate(id, name , hotelId );
+        if (Object.keys(nameService).length > 0) {
+            return Promise.reject({ messager: "Name already exists !" });
+        }
+    }
+
+    public findAll = async (hotelId : string) => {
+        const rs = await Repository.findAllWhereHotelId(hotelId);
         if (rs == null) {
             return Promise.reject({ messager: "Not Found" })
         }
@@ -34,26 +46,37 @@ export class ServicesService {
 
     public create = async (item: any) => {
        try {
-           const checkservice = await new ServicesService().checkvalidateService(item);
+            const validService = await new ServicesService().checkvalidateService(item);
+            await new ServicesService().checkvalidateNameServiceCreate(item.name , item.hotelId); // tim xem service cos trong HotelId do chua
             try {
                 const rs = await Repository.create(item);
                 if (rs) {
-                    return Promise.resolve({messager : "Sucsuess"});           
+                    const service = await Repository.findOne(item.id);
+                    return Promise.resolve({
+                        messager : "Sucsuess",
+                        inforService : service
+                    });           
                 }            
             } catch (error) {
                 return Promise.reject({messager : "Create Faild "});
             }
        } catch (error) {
-        return Promise.resolve(error);
+            return Promise.reject(error);
        }
     }
-    public update = async (id: string, item: []) => {
+    public update = async (id: string, item: any) => {
         try {
-            const checkservice = await new ServicesService().checkvalidateService(item)
+            const validService =  await new ServicesService().checkvalidateService(item);
+            await new ServicesService().checkvalidateNameServiceUpdate(id, item.name, item.hotelId);
             try {
                 const rs = await Repository.update(id, item);
                 if (rs) {
-                    return Promise.resolve({ messager: "Sucsess" })              
+                    const service : any= await Repository.findOne(id);
+                    console.log(service);
+                    return Promise.resolve({ 
+                        messager: "Sucsess", 
+                        inforService : service[0]
+                     })              
                 }
                 else{
                     return Promise.reject({ messager: "Service Id not exists !" });
@@ -66,12 +89,20 @@ export class ServicesService {
         }
       
     }
-    public delete = async (id: string) => {
-        const rs = await Repository.delete(id)
-        if (rs == 0) {
-            return Promise.reject({ messager: "Delete Faild" })
+    public delete = async (id: string, HotelId : string) => {
+        try {
+            const rs = await Repository.delete(id)
+            const inforService =  await Repository.findAllWhereHotelId(HotelId);;
+            if (rs == 0) {
+                return Promise.reject({ messager: "Delete Faild" })
+            }
+            return Promise.resolve({ 
+                messager: "Sucsuess",
+                inforService : inforService 
+            })
+            } catch (error) {
+                return Promise.reject(error);
         }
-        return Promise.resolve({ messager: "Sucsuess" })
     }
 
     public findOne = async (id: string) => {

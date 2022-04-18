@@ -3,17 +3,20 @@ import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { StatusCode } from './StatusCode';
 import { BaseController } from './BaseController';
+import { TokenService } from '../Services/Token'
 const baseController = new BaseController();
 const statusCode = new StatusCode();
+const tokenService = new TokenService();
 
 const service = new ServicesService();
 
 export class ServicesController {
 
 
-    public findAll = (req: Request, res: Response, next: NextFunction) => {
-
-        service.findAll()
+    public findAll = async (req: Request, res: Response, next: NextFunction) => {
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
+        service.findAll(HotelId)
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })
@@ -23,9 +26,12 @@ export class ServicesController {
 
     }
 
-    public create = (req: Request, res: Response, next: NextFunction) => {
+    public create =async (req: Request, res: Response, next: NextFunction) => {
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
         const item = req.body;
         item.id = uuidv4();
+        item.hotelId = HotelId;
         service.create(item)
             .then(result => {
                 baseController.sendResponse(result, req, res);
@@ -33,10 +39,13 @@ export class ServicesController {
             .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
     }
 
-    public update = (req: Request, res: Response, next: NextFunction) => {
+    public update =async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
         const id = req.params.id;
         item.updatedAt = new Date();
+        item.hotelId = HotelId;
         service.update(id, item)
             .then(result => {
                 baseController.sendResponse(result, req, res);
@@ -63,9 +72,11 @@ export class ServicesController {
 
     }
 
-    public delete = (req: Request, res: Response, next: NextFunction) => {
+    public delete = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.params.id;
-        service.delete(id)
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
+        service.delete(id , HotelId)
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })

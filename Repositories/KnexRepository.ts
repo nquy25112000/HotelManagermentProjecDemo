@@ -9,9 +9,15 @@ export abstract class KnexRepository<T> implements RepositoryGeneral<T> {
         public tableName: string
     ) { this.tableName = tableName; }
 
+    findAllWhereHotelId(hotelId: string): Promise<T[]> {
+        return knex.table(this.tableName)
+            .select()
+            .where(this.tableName + ".hotelId", "=", hotelId)
+    }
+
     delete(id: string): Promise<any> {
         return knex(this.tableName)
-            .where('uuid', id)
+            .where('id', id)
             .del()
     }
 
@@ -26,13 +32,13 @@ export abstract class KnexRepository<T> implements RepositoryGeneral<T> {
     }
     update(id: string, item: T[]): Promise<T[]> {
         return knex(this.tableName)
-            .where('uuid', '=', id)
+            .where('id', '=', id)
             .update(item)
     }
     findOne(id: string): Promise<boolean> {
         return knex(this.tableName)
             .where({
-                uuid: id
+                id: id
             })
             .select()
     }
