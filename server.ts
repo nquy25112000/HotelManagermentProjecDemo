@@ -20,6 +20,7 @@ import { BillRouter } from './Router/Bill'
 import { BookRoomRouter } from './Router/BookRoom'
 import { ServiceRouter } from './Router/Services'
 import { ServiceOrdersRouter } from './Router/ServiceOrders'
+import { RoomTypeRouter } from './Router/Roomtype'
 import { RoomRouter } from './Router/Room'
 
 import { TokenController } from './Controllers/Token'
@@ -39,6 +40,7 @@ const billRouter = new BillRouter();
 const serviceRouter = new ServiceRouter();
 const serviceOrdersRouter = new ServiceOrdersRouter();
 const bookRoomRouter = new BookRoomRouter();
+const roomTypeRouter = new RoomTypeRouter();
 
 
 
@@ -72,18 +74,16 @@ class Server {
 
     public router(): void {
         this.app
-            .use('/role', tokenController.authorization, tokenController.RoleRoot, roleRouter.Router)
-            .use('/users', tokenController.authorization, tokenController.RoleRoot, usersRouter.Router)
-            .use('/hotel', holtelRouter.Router)
-            // .use('/hotel', tokenController.authorization, tokenController.RoleRoot, holtelRouter.Router)
-            .use('/room', tokenController.authorization, tokenController.RoleRoot, roomRouter.Router)
-            .use('/bill', billRouter.Router)
-            // .use('/bill', tokenController.authorization, tokenController.RoleRoot, billRouter.Router)
-            .use('/services', serviceRouter.Router)
-            // .use('/orders', tokenController.authorization, tokenController.RoleRoot, serviceOrdersRouter.Router)
-            .use('/orders', serviceOrdersRouter.Router)
+            .use('/hotel', tokenController.authorization, tokenController.RoleRoot, holtelRouter.Router)
+            .use('/role', tokenController.authorization, roleRouter.Router)
 
-            .use('/bookroom', tokenController.authorization, tokenController.RoleRoot, bookRoomRouter.Router)
+            .use('/users', tokenController.authorization, tokenController.RoleAdmin, usersRouter.Router)
+            .use('/room', tokenController.authorization, roomRouter.Router)
+            .use('/roomtype', tokenController.authorization, roomTypeRouter.Router)
+            .use('/bill', tokenController.authorization, billRouter.Router)
+            .use('/services', tokenController.authorization, serviceRouter.Router)
+            .use('/orders', tokenController.authorization, serviceOrdersRouter.Router)
+            .use('/bookroom', tokenController.authorization, bookRoomRouter.Router)
 
             .post('/login', passportController.Authenticate, tokenController.createToken)
 

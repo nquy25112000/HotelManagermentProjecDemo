@@ -21,6 +21,12 @@ export class TokenRepository {
             .innerJoin("Token", "Token.userId", "=", "Users.id")
             .where("Token.tokenCode", "=", `${token}`)
     }
+    findUserIdWhereToken(token: any): Promise<any> {
+        return knex.table('Users')
+            .select("Users.id")
+            .innerJoin("Token", "Token.userId", "=", "Users.id")
+            .where("Token.tokenCode", "=", `${token}`)
+    }
 
     findRole(token: string): Promise<any> {
         return knex.table('Role')
@@ -29,7 +35,7 @@ export class TokenRepository {
             .innerJoin("Token", "Token.userId", "=", "Users.id")
             .where({ tokenCode: token })
     }
-    updateWhereToken(token: string, time: any): Promise<any> {
+    updateTimeExpire(token: string, time: any): Promise<any> {
         return knex.table("Token")
             .update({ timeExpire: time })
             .where({ tokenCode: token })

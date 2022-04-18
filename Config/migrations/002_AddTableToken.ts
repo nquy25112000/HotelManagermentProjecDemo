@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<void> {
             table.string('tokenCode', 255).notNullable();
             table.dateTime('timeExpire').notNullable();
             table.specificType('userId', 'CHAR(36)').notNullable();
-            table.foreign('userId').references('id').inTable('Users');
+            table.foreign('userId').references('id').inTable('Users').onUpdate("CASCADE");
             table.timestamp('createdAt')
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP'));
             table
