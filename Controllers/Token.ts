@@ -17,23 +17,6 @@ export class TokenController extends BaseController {
             res.json(err);
         }
     }
-
-    // public authorization = (req: Request, res: Response, next: NextFunction) => {
-    //     let author = req.headers['authorization'];
-    //     const token = author?.split(" ")[1];
-    //     service.checkToken(token)
-    //         .then(result => {
-    //             if (result) {
-    //                 const time = result[0].timeExpire;
-    //                 service.checkTimeToken(time)
-    //                     .then(() => {
-    //                         next();
-    //                     })
-    //                     .catch(err => { res.json(err) })
-    //             }
-    //         })
-    //         .catch(err => { res.json(err) })
-    // }
     public authorization = async (req: Request, res: Response, next: NextFunction) => {
         let author = req.headers['authorization'];
         const token = author?.split(" ")[1];
@@ -49,7 +32,31 @@ export class TokenController extends BaseController {
     public RoleRoot = (req: Request, res: Response, next: NextFunction) => {
         const author = req.headers['authorization'];
         const token = author?.split(" ")[1];
-        service.RoleRootAndAdmin(token)
+        service.RoleRoot(token)
+            .then(() => {
+                next();
+            })
+            .catch((err) => {
+                res.status(403).json(err)
+            })
+
+    }
+    public RoleAdmin = (req: Request, res: Response, next: NextFunction) => {
+        const author = req.headers['authorization'];
+        const token = author?.split(" ")[1];
+        service.RoleAdmin(token)
+            .then(() => {
+                next();
+            })
+            .catch((err) => {
+                res.status(403).json(err)
+            })
+
+    }
+    public RoleAdminAndUser = (req: Request, res: Response, next: NextFunction) => {
+        const author = req.headers['authorization'];
+        const token = author?.split(" ")[1];
+        service.RoleAdminAndUser(token)
             .then(() => {
                 next();
             })

@@ -77,9 +77,6 @@ export class BookRoomController extends BaseController {
         } catch (error) {
             this.sendResponse(error, req, res.status(400))
         }
-
-
-
     }
 
     public delete = async (req: Request, res: Response, next: NextFunction) => {

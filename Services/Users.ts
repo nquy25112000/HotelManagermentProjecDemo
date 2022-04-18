@@ -3,16 +3,19 @@ import { HotelRepository } from '../Repositories/Repository/Hotel';
 import { RoleRepository } from '../Repositories/Repository/Role';
 import { BookRoomRepository } from '../Repositories/Repository/BookRoom';
 
+import { Users } from '../Models/Users'
+
 
 const Repository = new UsersRepository();
 const hotelRepository = new HotelRepository();
 const roleRepository = new RoleRepository();
 const bookRoomRepository = new BookRoomRepository();
+const usersModel = new Users()
 
 
 export class UsersService {
-    public findAll = async () => {
-        const rs = await Repository.findAll();
+    public findAll = async (hotelId: string, id: string) => {
+        const rs = await Repository.findAllWhereHotelOtherUserId(hotelId, id);
         const lengthObject = Object.keys(rs).length;
         if (lengthObject == 0) {
             return Promise.reject({ messager: "No data to display" });
@@ -22,65 +25,55 @@ export class UsersService {
 
     public create = async (item: []) => {
         await Repository.create(item);
-        return Promise.resolve({ messager: "Sucsuess" });
+        return Promise.resolve({ result: item });
     }
 
-    public update = async (id: string, item: []) => {
-        const findOne = await Repository.findOne(id);
+    public update = async (id: string, item: [], hotelId: string) => {
+        const findOne = await Repository.findOneWhereHotelId(id, hotelId);
         const lengthObject = Object.keys(findOne).length;
         if (lengthObject == 0) {
             return Promise.reject({ messager: "User Data Not Found" });
         }
         else {
             await Repository.update(id, item);
-            return Promise.resolve({ messager: "Sucsuess" });
+            return Promise.resolve({ result: item });
         }
 
     }
 
-    public delete = async (id: any) => {
-        const findOne = await Repository.findOne(id);
-        if (findOne == false) {
+    public delete = async (id: any, hotelId: string) => {
+        const findOne = await Repository.findOneWhereHotelId(id, hotelId);
+        const lengthObjectFindOne = Object.keys(findOne).length;
+        if (lengthObjectFindOne == 0) {
             return Promise.reject({ messager: "User Data Not Found" });
         }
         else {
             const bookroomId = await bookRoomRepository.findUsers(id);
-            const lengthObject = Object.keys(bookroomId).length;
-            if (lengthObject == 0) {
+            const lengthObjectFindUsers = Object.keys(bookroomId).length;
+            if (lengthObjectFindUsers == 0) {
                 await Repository.delete(id);
-                return Promise.resolve({ messager: "Sucsuess" });
+                const rs = await Repository.findAllWhereHotelId(hotelId); // FE yêu cầu trả về dữ liệu sau khi xóa để khỏi load lại trang
+                return Promise.resolve({ result: rs });
             }
             return Promise.reject({ messager: "This room contains some booking data, Please clear the reservation data before deleting the Room" })
-
         }
-
     }
-    public findOne = async (id: string) => {
-        const rs = await Repository.findOne(id);
+    public findOne = async (id: string, hotelId: string) => {
+        const rs = await Repository.findOneWhereHotelId(id, hotelId);
         const lengthObject = Object.keys(rs).length;
         if (lengthObject == 0) {
             return Promise.reject({ messager: "User Data Not Found" });
         }
         return Promise.resolve({ result: rs });
     }
-
-    public findItem = async (item: []) => {
-        const rs = await Repository.findItem(item);
-        const lengthObject = Object.keys(rs).length;
-        if (lengthObject == 0) {
-            return Promise.reject({ messager: "User Data Not Found" });
-        }
-        return Promise.resolve({ result: rs });
-    }
-
 
     public selectAcount = async (user: string, pass: string) => {
         const rs = await Repository.selectAcount(user, pass);
         return rs;
     }
 
-    public checkUserName = async (username: string) => {
-        const rs = await Repository.findUserName(username);
+    public checkUserName = async (username: string, hotelId: string) => {
+        const rs = await Repository.findUserNameById(username, hotelId);
         const lengthObject = Object.keys(rs).length;
         if (lengthObject > 0) {
             return Promise.reject({ message: "Username already exists" })
@@ -88,7 +81,16 @@ export class UsersService {
         return Promise.resolve();
     }
 
-    public checkValidInput = (username: string, password: any, fullName: any, birtDate: any, adress: any, phone: any, hotelId: any, roleId: any) => {
+    public checkUserNameOtherId = async (username: string, id: string, hotelId: string) => {
+        const rs = await Repository.findUserNameOtherId(username, id, hotelId);
+        const lengthObject = Object.keys(rs).length;
+        if (lengthObject > 0) {
+            return Promise.reject({ message: "Username already exists" })
+        }
+        return Promise.resolve();
+    }
+
+    public checkValidInput = (username: string, password: any, fullName: any, birtDate: any, adress: any, phone: any, roleId: any) => {
         if (username.trim() == null || username.trim() == "" || username == undefined) {
             return Promise.reject({ message: "Please enter Username" })
         }
@@ -119,8 +121,8 @@ export class UsersService {
         if (isNaN(phone)) {
             return Promise.reject({ message: "Please enter a series of numbers in Phone" })
         }
-        if (hotelId.trim() == null || hotelId.trim() == "") {
-            return Promise.reject({ message: "Please select a Hotel" })
+        if (roleId.trim() == null || roleId.trim() == "") {
+            return Promise.reject({ message: "Please select Role" })
         }
         return Promise.resolve();
     }

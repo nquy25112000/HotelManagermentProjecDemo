@@ -20,15 +20,9 @@ export class UsersRouter {
         this.Router.get('/findAll', Controller.findAll);
         this.Router.get('/findOne/:id', Controller.findOne);
 
-
-        this.Router.get('/acount', Controller.selectAcount);
-
-        this.Router.get('/findItem', Controller.findItem);
-
         this.Router.post('/create', Controller.create);
         this.Router.put('/update/:id', Controller.update);
         this.Router.delete('/delete/:id', Controller.delete);
-        this.Router.delete('/login', Controller.delete);
     }
 
     public config(): void {
