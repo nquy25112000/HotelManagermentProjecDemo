@@ -9,12 +9,6 @@ export abstract class KnexRepository<T> implements RepositoryGeneral<T> {
         public tableName: string
     ) { this.tableName = tableName; }
 
-    findAllWhereHotelId(hotelId: string): Promise<T[]> {
-        return knex.table(this.tableName)
-            .select()
-            .where(this.tableName + ".hotelId", "=", hotelId)
-    }
-
     delete(id: string): Promise<any> {
         return knex(this.tableName)
             .where('id', id)

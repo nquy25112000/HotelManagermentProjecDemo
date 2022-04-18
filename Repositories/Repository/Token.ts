@@ -21,13 +21,6 @@ export class TokenRepository {
             .select()
             .where({ tokenCode: token })
     }
-    findHoteIdlWhereToken(token: any): Promise<any> {
-        return knex.table('Hotel')
-            .select("Hotel.id")
-            .innerJoin("Users", "Users.hotelId", "=", "Hotel.id")
-            .innerJoin("Token", "Token.userId", "=", "Users.id")
-            .where("Token.tokenCode", "=", `${token}`)
-    }
     findUserIdWhereToken(token: any): Promise<any> {
         return knex.table('Users')
             .select("Users.id")
