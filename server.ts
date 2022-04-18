@@ -74,6 +74,7 @@ class Server {
 
     public router(): void {
         this.app
+
             .use('/hotel', tokenController.authorization, tokenController.RoleRoot, holtelRouter.Router)
             .use('/role', tokenController.authorization, roleRouter.Router)
 

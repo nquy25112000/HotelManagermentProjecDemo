@@ -11,9 +11,18 @@ export class ServiceRepository extends KnexRepository<Service> {
         super(service.tableName);
     }
 
-    checkNameService(name : string ): Promise<Service[]> {
+    checkNameServiceCreate(name : string , hotelId : string): Promise<Service[]> {
         return knex(this.tableName)
                 .where('name', '=', name)
+                .andWhere('hotelId ', '=', hotelId)
+                .select()
+                ;
+    }
+    checkNameServiceUpdate(id: string, name : string, hotelId : string ): Promise<Service[]> {
+        return knex(this.tableName)
+                .whereNot('id', '=', id)
+                .andWhere('name', '=', name)
+                .andWhere('hotelId ', '=', hotelId)
                 .select()
                 ;
     }

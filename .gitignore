@@ -1,8 +1,4 @@
 node_modules
 lib
-<<<<<<< HEAD
-package-lock.json
-=======
 package-lock.json
 server.ts
->>>>>>> truong

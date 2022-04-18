@@ -9,6 +9,13 @@ export class TokenRepository {
             .insert(item)
     }
 
+    findHoteIdlWhereToken(token: any): Promise<any> {
+        return knex.table('Hotel')
+            .select("Hotel.id")
+            .innerJoin("Users", "Users.hotelId", "=", "Hotel.id")
+            .innerJoin("Token", "Token.userId", "=", "Users.id")
+            .where("Token.tokenCode", "=", `${token}`)
+    }
     findToKenCode(token: string): Promise<any> {
         return knex("Token")
             .select()

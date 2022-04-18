@@ -23,14 +23,16 @@ export class HotelController {
 
 }
 
-    public create =  (req: Request, res: Response, next: NextFunction) => {
-        const item = req.body;
-        item.id = uuidv4();
-        service.create(item)
-        .then(result => {
+    public create = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const item = req.body;
+            item.id = uuidv4();
+            const result = await service.create(item);
             baseController.sendResponse(result, req, res);
-        })
-        .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
+        } catch (error) {
+             baseController.sendResponse(error, req, res.status(500)); 
+        }
+        
     }
 
     public update =  (req: Request, res: Response, next: NextFunction) => {
