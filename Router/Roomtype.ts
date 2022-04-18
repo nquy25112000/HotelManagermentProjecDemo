@@ -1,15 +1,16 @@
 import express from 'express';
 import { Router } from "express";
-import { RoomController } from "../Controllers/Room"
+import { RoomTypeController } from "../Controllers/RoomType"
 import bodyParser from 'body-parser';
 import { TokenController } from '../Controllers/Token';
 
 
 const tokenController = new TokenController();
-const Controller = new RoomController();
+
+const Controller = new RoomTypeController();
 
 
-export class RoomRouter {
+export class RoomTypeRouter {
     public Router: Router;
 
     constructor() {

@@ -17,21 +17,23 @@ export class UsersRepository extends KnexRepository<Users> {
             .andWhere('password', '=', pass)
             .select()
     };
-    findUserName(user: string): Promise<Users[]> {
+    findUserNameById(user: string, hotelId: string): Promise<Users[]> {
         return knex(this.tableName)
             .where('username', '=', user)
+            .andWhere('hotelId', '=', hotelId)
             .select()
     };
-    selectPass(pass: string): Promise<boolean> {
+    findUserNameOtherId(user: string, id: any, hotelId: string): Promise<Users[]> {
         return knex(this.tableName)
-            .where('username', '=', pass)
+            .where('username', '=', user)
+            .andWhere('id', '!=', id)
+            .andWhere('hotelId', '=', hotelId)
             .select()
     };
-
-    checkHotelId(id: string): Promise<any> {
-        return knex("Hotel")
-            .select("Hotel.id")
-            .innerJoin("Room", "Room.hotelId", "=", "Hotel.id")
-            .where({ hotelId: id })
+    findAllWhereHotelOtherUserId(hotelId: string, id: string): Promise<any> {
+        return knex.table(this.tableName)
+            .select()
+            .where(this.tableName + ".hotelId", "=", hotelId)
+            .andWhere(this.tableName + ".id", "!=", id)
     }
 }

@@ -27,14 +27,26 @@ export class TokenService {
         }
         const rs = await repository.create(item);
         if (rs) {
-            const checkRole = await repository.findJoin(accesToken);
+            const checkRole = await repository.findRole(accesToken);
             const role = checkRole[0].name;
             return Promise.resolve({ messager: "Sucsess", Token: accesToken, role: role })
         }
         return Promise.reject({ messager: "Create Faild" })
 
     }
-    
+
+    public findHotelIdWhereToken = async (token: any) => {
+        const rs = await repository.findHoteIdlWhereToken(token);
+        const hotelId = rs[0].id;
+        return Promise.resolve(hotelId);
+    }
+    public findUserIdWhereToken = async (token: any) => {
+        const rs = await repository.findUserIdWhereToken(token);
+        const hotelId = rs[0].id;
+        return Promise.resolve(hotelId);
+    }
+
+
 
     public checkToken = async (token: any) => {
         if (token == undefined) {
@@ -44,25 +56,24 @@ export class TokenService {
         if (Object.keys(findToken).length == 0) {
             return Promise.reject({ messager: "Invalid verification code" });
         }
-        else { //ngược lại nếu có dữ liệu token đó thì dùng token đó và update thêm time cho token đó
+        else {
             const today = new Date();
-
             const MilisecondTodate = today.getTime();
             const milisecondTimeExpire = await findToken[0].timeExpire.getTime();
             if (MilisecondTodate > milisecondTimeExpire) {
                 return Promise.reject({ messager: "Session has expired, please login again" });
             }
 
-            const newMilisecondTimeExpire = MilisecondTodate + 10800000; //cộng 3 tiếng, nhưng cộng mili giây
+            const newMilisecondTimeExpire = MilisecondTodate + 10800000;
             const date = new Date(newMilisecondTimeExpire);
-            await repository.updateWhereToken(token, date);
+            await repository.updateTimeExpire(token, date);
             return Promise.resolve();
         }
 
     }
 
     public RoleRootAndAdmin = async (token: any) => {
-        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const result = await repository.findRole(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Root" || roleName == "Admin") {
             return Promise.resolve();
@@ -70,7 +81,7 @@ export class TokenService {
         return Promise.reject({ messager: "You Forbidden" });
     }
     public RoleAdminAndUser = async (token: any) => {
-        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const result = await repository.findRole(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Admin" || roleName == "User") {
             return Promise.resolve();
@@ -78,7 +89,7 @@ export class TokenService {
         return Promise.reject({ messager: "You Forbidden" });
     }
     public RoleRoot = async (token: any) => {
-        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const result = await repository.findRole(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Root") {
             return Promise.resolve();
@@ -86,19 +97,12 @@ export class TokenService {
         return Promise.reject({ messager: "You Forbidden" });
     }
     public RoleAdmin = async (token: any) => {
-        const result = await repository.findJoin(token) //xem token đó có quyền gì
+        const result = await repository.findRole(token) //xem token đó có quyền gì
         const roleName = result[0].name;
         if (roleName == "Admin") {
             return Promise.resolve();
         }
         return Promise.reject({ messager: "You Forbidden" });
-    }
-    public checkTimeToken = async (date: any) => {
-        const dateNow = new Date().getTime();
-        if (dateNow - date.getTime() >= 0) {
-            return Promise.reject({ messager: "Session has expired, please login again" });
-        }
-        return Promise.resolve();
     }
 
 }
