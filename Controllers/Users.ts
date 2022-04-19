@@ -85,8 +85,9 @@ export class UsersController extends BaseController {
         const id = req.params.id;
         const token = req.headers["authorization"]?.split(" ")[1];
         const HotelId = await tokenService.findHotelIdWhereToken(token);
+        const UserIdAdmin = await tokenService.findUserIdWhereToken(token);
         try {
-            const result = await service.delete(id, HotelId);
+            const result = await service.delete(id, HotelId, UserIdAdmin);
             this.sendResponse(result, req, res.status(200));
         } catch (error) {
             this.sendResponse(error, req, res.status(400));

@@ -28,9 +28,11 @@ export class RoomController extends BaseController {
         const HotelId = await tokenService.findHotelIdWhereToken(token);
         item.hotelId = HotelId;
         item.id = uuidv4();
+        item.status = "0";
         try {
-            await service.checkValidateRoomName(item.name, HotelId);
-            await service.checkValidInput(item.name, item.roomTypeId);
+            await service.checkValidInput(item.name, item.roomTypeId, item.status);
+            await service.checkValidateRoomNameToCreate(item.name, HotelId);
+            await service.checkValidRoomTypeId(item.roomTypeId, HotelId)
             const result = await service.create(item);
             this.sendResponse(result, req, res.status(200));
         }
@@ -43,11 +45,14 @@ export class RoomController extends BaseController {
     public update = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
         const id = req.params.id;
+        item.id = id;
         const token = req.headers["authorization"]?.split(" ")[1];
         const HotelId = await tokenService.findHotelIdWhereToken(token);
         item.hotelId = HotelId;
         try {
-            await service.checkValidateRoomName(item.name, HotelId);
+            await service.checkValidInput(item.name, item.roomTypeId, item.status);
+            await service.checkValidateRoomNameToUpdate(item.name, HotelId, id);
+            await service.checkValidRoomTypeId(item.roomTypeId, HotelId);
             const result = await service.update(id, item, HotelId);
             this.sendResponse(result, req, res.status(200));
         }

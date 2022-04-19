@@ -41,7 +41,7 @@ export class UsersService {
 
     }
 
-    public delete = async (id: any, hotelId: string) => {
+    public delete = async (id: any, hotelId: string, idAdmin: string) => {
         const findOne = await Repository.findOneWhereHotelId(id, hotelId);
         const lengthObjectFindOne = Object.keys(findOne).length;
         if (lengthObjectFindOne == 0) {
@@ -52,7 +52,7 @@ export class UsersService {
             const lengthObjectFindUsers = Object.keys(bookroomId).length;
             if (lengthObjectFindUsers == 0) {
                 await Repository.delete(id);
-                const rs = await Repository.findAllWhereHotelId(hotelId); // FE yêu cầu trả về dữ liệu sau khi xóa để khỏi load lại trang
+                const rs = await Repository.findAllWhereHotelOtherUserId(hotelId, idAdmin); // FE yêu cầu trả về dữ liệu sau khi xóa để khỏi load lại trang
                 return Promise.resolve({ result: rs });
             }
             return Promise.reject({ messager: "This room contains some booking data, Please clear the reservation data before deleting the Room" })

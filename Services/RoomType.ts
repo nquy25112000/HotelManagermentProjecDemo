@@ -25,8 +25,8 @@ export class RoomTypeService {
     }
 
     public update = async (id: string, item: [], hotelId: string) => {
-            await Repository.update(id, item);
-            return Promise.resolve({ result: item });
+        await Repository.update(id, item);
+        return Promise.resolve({ result: item });
 
     }
     public delete = async (id: string, hotelId: string) => {
@@ -42,7 +42,7 @@ export class RoomTypeService {
                 return Promise.reject({ messager: "This room type data is being used." })
             }
             await Repository.delete(id);
-            const rs = await this.findAll(hotelId);
+            const rs = await Repository.findAllWhereHotelId(hotelId);
             return Promise.resolve({ result: rs });
         }
 
@@ -52,7 +52,7 @@ export class RoomTypeService {
         const rs = await Repository.findOneWhereHotelId(id, hotelId);
         const lengthObject = Object.keys(rs).length;
         if (lengthObject == 0) {
-            return Promise.reject({ messager: "Room Data Not Found" });
+            return Promise.reject({ messager: "Room Type Data Not Found" });
         }
         return Promise.resolve({ result: rs });
     }

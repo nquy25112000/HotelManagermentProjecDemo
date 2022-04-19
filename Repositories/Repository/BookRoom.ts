@@ -38,5 +38,28 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
             .where('userId', '=', id)
             .select();
     }
+    findAllBookRoomWhereHotelId(id: string): Promise<any> {
+        return knex.table(bookRoom.tableName)
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.roomId", "Room.name", "BookRoom.userId", "Users.fullName")
+            .innerJoin("Room", "Room.id", "=", bookRoom.tableName + ".roomId")
+            .innerJoin("Users", "Users.id", "=", bookRoom.tableName + ".userId")
+            .where('Room.hotelId', "=", id)
+    }
+    findOneBookRoomWhereHotelId(hotelId: string, bookRoomId: any): Promise<any> {
+        return knex.table(bookRoom.tableName)
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.roomId", "Room.name", "BookRoom.userId", "Users.fullName")
+            .innerJoin("Room", "Room.id", "=", "BookRoom.id")
+            .innerJoin("Users", "Users.id", "=", "BookRoom.id")
+            .where('Room.hotelId', "=", hotelId)
+            .andWhere("BookRoom.id", "=", bookRoomId)
+            .andWhere("BookRoom.id", "=", bookRoomId)
+    }
+
+    findBookRoomWhereRoomIdAndHotelId(id: string): Promise<any> {
+        return knex.table(bookRoom.tableName)
+            .select()
+            .innerJoin("Room", "Room.id", "=", bookRoom.tableName + ".roomId")
+            .where('Room.hotelId', "=", id)
+    }
 }
 

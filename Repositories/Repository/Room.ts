@@ -10,11 +10,18 @@ export class RoomRepository extends KnexRepository<Room> {
     constructor() {
         super(room.tableName);
     }
-    checkValidateRoomName(roomName: string , hotelid: string): Promise<any> {
+    checkValidateRoomName(roomName: string, hotelid: string): Promise<any> {
         return knex(this.tableName)
             .select()
             .where({ name: roomName })
             .andWhere({ hotelId: hotelid })
+    }
+    checkValidateRoomNameOtherId(roomName: string, hotelid: string, id: string): Promise<any> {
+        return knex(this.tableName)
+            .select()
+            .where({ name: roomName })
+            .andWhere({ hotelId: hotelid })
+            .andWhere("id", "!=", id)
     }
     checkHotelId(hotelId: string): Promise<any> {
         return knex("Hotel")
