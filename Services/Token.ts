@@ -8,7 +8,7 @@ const repository = new TokenRepository();
 export class TokenService {
 
     public findHotelIdWhereToken = async (token: any) => {
-        const rs : any = await repository.findHoteIdlWhereToken(token);
+        const rs: any = await repository.findHoteIdlWhereToken(token);
         const hotelId = rs[0].id;
         return Promise.resolve(hotelId);
     }
@@ -35,11 +35,6 @@ export class TokenService {
 
     }
 
-    public findHotelIdWhereToken = async (token: any) => {
-        const rs = await repository.findHoteIdlWhereToken(token);
-        const hotelId = rs[0].id;
-        return Promise.resolve(hotelId);
-    }
     public findUserIdWhereToken = async (token: any) => {
         const rs = await repository.findUserIdWhereToken(token);
         const hotelId = rs[0].id;
