@@ -18,4 +18,14 @@ export class ServiceOrdersRepository extends KnexRepository<ServiceOrders> {
                 .sum('total  as sum')
                 ;
     }
+
+    checkBookroomByHotelId(id : string , hotelId : string): Promise<ServiceOrders[]> {
+        return knex.select()
+        .from('Room')
+        .innerJoin('BookRoom', function() { this.on('BookRoom.id ', knex.raw('?', [id ]))  
+                                    .andOn('BookRoom.roomId', '=', ' Room.id')
+                                    .andOn('Room.hotelId', knex.raw('?', [hotelId]))})   
+    }
+
+    
 }

@@ -19,11 +19,11 @@ export class ServiceOrdersService {
         return Promise.resolve({ result: rs })
     }
 
-    public checkvalidateBookRoom  = async (bookRoomId : string) => {
+    public checkvalidateBookRoom  = async (bookRoomId : string , hotelid : string) => {
         if(typeof bookRoomId === "undefined"){
             return Promise.reject({ messager: "BookRoom undefined !" })
         }
-        const rs = await BookroomRepo.findOne(bookRoomId);
+        const rs = await Repository.checkBookroomByHotelId(bookRoomId , hotelid);
         
         if (Object.keys(rs).length == 0) {
             return Promise.reject({ messager: "BookRoom Invalid !" })
@@ -33,16 +33,16 @@ export class ServiceOrdersService {
         }
     }
 
-    public checkvalidateServiceOrder  = async (serviceOrderId : any) => {
-        const rs = await Repository.findOne(serviceOrderId);
-        if (Object.keys(rs).length == 0) {
-            return Promise.reject({ messager: "BookRoom Invalid !" })
-        }
-        else {
-            return Promise.resolve( rs );
-        }
+    // public checkvalidateServiceOrder  = async (serviceOrderId : any) => {
+    //     const rs = await Repository.findOne(serviceOrderId);
+    //     if (Object.keys(rs).length == 0) {
+    //         return Promise.reject({ messager: "BookRoom Invalid !" })
+    //     }
+    //     else {
+    //         return Promise.resolve( rs );
+    //     }
 
-    }
+    // }
 
     public checkvalidateNumberService  = async (number : any) => {
         if(typeof number === "undefined"){
@@ -56,11 +56,11 @@ export class ServiceOrdersService {
         }
     }
 
-    public checkvalidateServive  = async (serviceId : string) => {
+    public checkvalidateServive  = async (serviceId : string , hotelId : string)=> {
         if(typeof serviceId === "undefined"){
             return Promise.reject({ messager: "ServiceId undefined !" })
         }
-        const rs = await serviceRepo.findOne(serviceId);
+        const rs = await serviceRepo.checkServiceByHotelId(serviceId , hotelId);
         if (Object.keys(rs).length == 0) {
             return Promise.reject({ messager: "Service Invalid !" })
         }
@@ -69,12 +69,12 @@ export class ServiceOrdersService {
         }
     }
 
-    public create = async (item: any) => {
+    public create = async (item: any , hotelId: any) => {
         try {
             var object: any = [];
-            const bookRoom = await new ServiceOrdersService().checkvalidateBookRoom(item.bookRoomId);
+            await new ServiceOrdersService().checkvalidateBookRoom(item.bookRoomId , hotelId);
             for (let i = 0; i < item.order.length; i++) {
-                const service : any = await new ServiceOrdersService().checkvalidateServive(item.order[i].serviceId);
+                const service : any = await new ServiceOrdersService().checkvalidateServive(item.order[i].serviceId , hotelId);
                 const number = await new ServiceOrdersService().checkvalidateNumberService(item.order[i].number)
                 const total = service[0].price * number;
                 item.order[i].total = total;
@@ -96,10 +96,10 @@ export class ServiceOrdersService {
     }
 
 
-    public update = async (id: string, item: any) => {
+    public update = async (id: string, item: any , hotelId : any) => {
         try {
-            const bookRoom = await new ServiceOrdersService().checkvalidateBookRoom(item.bookRoomId); 
-            const service : any = await new ServiceOrdersService().checkvalidateServive(item.serviceId);
+            const bookRoom = await new ServiceOrdersService().checkvalidateBookRoom(item.bookRoomId, hotelId); 
+            const service : any = await new ServiceOrdersService().checkvalidateServive(item.serviceId , hotelId);
             const number = await new ServiceOrdersService().checkvalidateNumberService(item.number)
             const total = service[0].price * number;
             item.total = total;
@@ -120,7 +120,8 @@ export class ServiceOrdersService {
        
     }
 
-    public delete = async (id: string) => {
+    public delete = async (id: string , hotelId : string) => {
+        await new ServiceOrdersService().checkvalidateServive(id , hotelId)
         const rs = await Repository.delete(id);
         if (rs == 0) {
             return Promise.reject({ messager: "Delete Faild" });
@@ -139,11 +140,13 @@ export class ServiceOrdersService {
     public findServiceByBookroom = async (id: string) => { // tim bookromid do dat cac service nao 
         const rs = await BillRepo.getInforserviceOrder(id);
         if (Object.keys(rs).length == 0) {
-            return Promise.reject({ messager: "BookRoom Invalid !" })
+            return Promise.resolve( {
+                messager: "BookRoom not order services !" 
+                , result: rs } );         
         }
-        else {
-            return Promise.resolve( { result: rs } );
-        }
+        // else {
+        //     return Promise.reject({ messager: "BookRoom not order services !" })
+        // }
         
     }
 
