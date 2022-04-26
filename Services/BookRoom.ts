@@ -1,148 +1,67 @@
 import { BookRoomRepository } from '../Repositories/Repository/BookRoom';
 import { RoomRepository } from '../Repositories/Repository/Room';
-import { UsersRepository } from '../Repositories/Repository/Users';
 
 
 const Repository = new BookRoomRepository();
-const userRepository = new UsersRepository();
 const roomRepository = new RoomRepository();
 
 
 
 export class BookRoomService {
     public findAllWhereHotel = async (hotelId: any) => {
-        const rs = await Repository.findAllBookRoomWhereHotelId(hotelId);
+        const rs = await Repository.findAllBookRoomWhereHotelIdPaymentNull(hotelId);
         if (rs == null) {
             return Promise.reject({ messager: "No Data to display" })
         }
         return Promise.resolve({ result: rs })
     }
 
-    public findOneWhereHotel = async (id: string, hotelId: string) => {
+    public findOneWhereHotel = async (hotelId: string, id: string) => {
         const rs = await Repository.findOneBookRoomWhereHotelId(hotelId, id);
         const lengthObject = Object.keys(rs).length;
         if (lengthObject == 0) {
-            return Promise.reject({ messager: "No data to display" });
+            return Promise.reject({ messager: "data undefined" });
         }
         return Promise.resolve({ result: rs });
     }
 
 
 
-
-    public create = async (item: []) => {
+    public create = async (item: any, hotelId: any, userId: any) => {
+        const status: any = { status: 1 }
+        item.userId = userId;
+        await this.checkInput(item.customerName, item.customerIdCard, item.fromDate, item.toDate, item.roomId)
+        await this.checkRoomId(item.roomId, hotelId)
+        await this.checkTimeToCreate(item.roomId, item.fromDate, item.toDate, hotelId);
+        await this.checkBetweenToCreate(item.fromDate, item.toDate, item.roomId, hotelId);
+        await roomRepository.update(item.roomId, status)
         await Repository.create(item);
-        return Promise.resolve({ messager: "Sucsuess" })
+        return Promise.resolve({ messager: item })
     }
 
-    public update = async (id: string, item: []) => {
-        const findOne = await Repository.findOne(id);
-        const lengthObject = Object.keys(findOne).length;
-        if (lengthObject == 0) {
-            return Promise.reject({ messager: "Reservation Data Not Found" });
-        }
-        else {
-            await Repository.update(id, item);
-            return Promise.resolve({ messager: "Sucsuess" });
-        }
+    public update = async (id: string, item: any, hotelId: any, userId: string) => {
 
-    }
-    public delete = async (id: string) => {
-        const findOne = await Repository.findOne(id)
-        if (findOne == false) {
-            return Promise.reject({ messager: "Reservation Data Not Found" });
-        }
-        else {
-            await Repository.delete(id);
-            return Promise.resolve({ messager: "Sucsuess" });
-        }
+        item.userId = userId;
+        await this.checkInput(item.customerName, item.customerIdCard, item.fromDate, item.toDate, item.roomId)
+        await this.checkRoomId(item.roomId, hotelId)
+        await this.checkTimeToCreate(item.roomId, item.fromDate, item.toDate, hotelId);
+        await this.checkBetweenToUpdate(item.roomId, item.fromDate, item.toDate, id, hotelId)
+        await Repository.update(id, item);
+        return Promise.resolve({ messager: item });
+
 
     }
 
-
-    public findItem = async (item: []) => {
-        const rs = await Repository.findItem(item);
-        const lengthObject = Object.keys(rs).length;
-        if (lengthObject == 0) {
-            return Promise.reject({ messager: "Reservation Data Not Found" });
-        }
-        return Promise.resolve({ result: rs });
+    public delete = async (id: string, hotelId: string) => {
+        await this.findOneWhereHotel(id, hotelId);
+        await Repository.delete(id);
+        const findAll = await this.findAllWhereHotel(hotelId);
+        return Promise.resolve({ messager: findAll });
     }
 
 
 
-    public checkTimeFromDateToCreate = async (RoomId: any, date: any) => {
-        const dateNow = new Date().getTime();
-        const fromDate = new Date(date).getTime();
-        if (fromDate < dateNow) {
-            return Promise.reject({ messager: "The reservation date cannot be less than the current date" })
-        }
-        else {
-            const findRoomId = await Repository.findRoomIdAndFromDateToDateToCreate(RoomId, date);
-            const lengthObject = Object.keys(findRoomId).length;
-            if (lengthObject > 0) {
-                const fromDateOfObject = findRoomId[0].fromDate
-                return Promise.reject({ messager: `Someone made a reservation on ${fromDateOfObject}` })
-            }
-            return Promise.resolve();
-
-        }
-    }
-
-    public checkTimeToDateToCreate = async (Fdate: any, Tdate: any, RoomId: any) => {
-        const fromDate = new Date(Fdate).getTime();
-        const toDate = new Date(Tdate).getTime();
-        if (toDate < fromDate) {
-            return Promise.reject({ messager: "Payment date must not be less than reservation date" })
-        }
-        else {
-            const findRoomId = await Repository.findRoomIdAndFromDateToDateToCreate(RoomId, Tdate);
-            const lengthObject = Object.keys(findRoomId).length;
-            if (lengthObject > 0) {
-                const fromDateOfObject = findRoomId[0].fromDate
-                return Promise.reject({ messager: `Someone made a reservation on ${fromDateOfObject} , Please select a check-out date before ${fromDateOfObject}` });
-            }
-            return Promise.resolve();
-        }
-    }
-
-
-    public checkTimeFromDateToUpdate = async (RoomId: any, date: any, id: any) => {
-        const dateNow = new Date().getTime();
-        const fromDate = new Date(date).getTime();
-        if (fromDate < dateNow) {
-            return Promise.reject({ messager: "The reservation date cannot be less than the current date" })
-        }
-        else {
-            const findRoomId = await Repository.findRoomIdAndFromDateToDateToUpDate(RoomId, date, id);
-            const lengthObject = Object.keys(findRoomId).length;
-            if (lengthObject > 0) {
-                const fromDateOfObject = findRoomId[0].fromDate
-                return Promise.reject({ messager: `Someone made a reservation on ${fromDateOfObject}` })
-            }
-            return Promise.resolve();
-
-        }
-    }
-
-    public checkTimeToDateToUpdate = async (Fdate: any, Tdate: any, RoomId: any, id: any) => {
-        const fromDate = new Date(Fdate).getTime();
-        const toDate = new Date(Tdate).getTime();
-        if (toDate < fromDate) {
-            return Promise.reject({ messager: "Payment date must not be less than reservation date" })
-        }
-        else {
-            const findRoomId = await Repository.findRoomIdAndFromDateToDateToUpDate(RoomId, Tdate, id);
-            const lengthObject = Object.keys(findRoomId).length;
-            if (lengthObject > 0) {
-                const fromDateOfObject = findRoomId[0].fromDate
-                return Promise.reject({ messager: `Someone made a reservation on ${fromDateOfObject} , Please select a check-out date before ${fromDateOfObject}` });
-            }
-            return Promise.resolve();
-        }
-    }
-
-    public checkInput = (customerName: string, customerIdCard: any, fromDate: any, toDate: any, roomId: any, userId: any) => {
+    public checkInput = (customerName: string, customerIdCard: any, fromDate: any, toDate: any, roomId: any) => {
         if (customerName.trim() == null || customerName.trim() == "") {
             return Promise.reject({ message: "Please enter Customer Name" })
         }
@@ -161,22 +80,11 @@ export class BookRoomService {
         if (roomId.trim() == null || roomId.trim() == "") {
             return Promise.reject({ message: "Please enter a date" })
         }
-        if (userId.trim() == null || userId.trim() == "") {
-            return Promise.reject({ message: "Please enter a date" })
-        }
         return Promise.resolve();
     }
 
-    public checkUserId = async (userId: any) => {
-        const user = await userRepository.findOne(userId);
-        if (user == false) {
-            return Promise.reject({ message: "Please select a valid user" })
-        }
-        return Promise.resolve();
-
-    }
-    public checkRoomId = async (roomId: any) => {
-        const room = await roomRepository.findOne(roomId);
+    public checkRoomId = async (roomId: any, hotelId: any) => {
+        const room = await roomRepository.findOneWhereHotelId(roomId, hotelId);
         if (room == false) {
             return Promise.reject({ message: "Please select a valid room" })
         }
@@ -185,4 +93,79 @@ export class BookRoomService {
     }
 
 
+    //check time create
+    public checkTimeToCreate = async (RoomId: any, Fdate: any, Tdate: any, hotelId: any) => {
+        const dateNow = new Date().getTime();
+        const fromDate = new Date(Fdate).getTime();
+        const toDate = new Date(Tdate).getTime();
+        if (fromDate < dateNow) {
+            return Promise.reject({ messager: "The preset time cannot be less than the current time" })
+        }
+        if (toDate < fromDate) {
+            return Promise.reject({ messager: "Check-out time cannot be less than check-in time" })
+        }
+        else {
+            const findRoomIdByFromDate = await Repository.findRoomIdAndFromDateToDateToCreate(RoomId, Fdate, hotelId);
+            const lengthObjectFromDate = Object.keys(findRoomIdByFromDate).length;
+            if (lengthObjectFromDate > 0) {
+                return Promise.reject({ messager: `Check-in date cannot coincide with the booked time`, result: findRoomIdByFromDate });
+            }
+
+            const findRoomIdByToDate = await Repository.findRoomIdAndFromDateToDateToCreate(RoomId, Tdate, hotelId);
+            const lengthObjectToDate = Object.keys(findRoomIdByToDate).length;
+            if (lengthObjectToDate > 0) {
+                return Promise.reject({ messager: `Check-out date must not coincide with the booked time`, result: findRoomIdByToDate });
+            }
+
+            return Promise.resolve();
+
+        }
+    }
+
+
+    //check time update
+    public checkTimeToUpdate = async (Fdate: any, Tdate: any, RoomId: any, id: any, hotelId: any) => {
+        const dateNow = new Date().getTime();
+        const fromDate = new Date(Fdate).getTime();
+        const toDate = new Date(Tdate).getTime();
+        if (fromDate < dateNow) {
+            return Promise.reject({ messager: "The preset time cannot be less than the current time" })
+        }
+        if (toDate < fromDate) {
+            return Promise.reject({ messager: "Check-out time cannot be less than check-in time" })
+        }
+        else {
+            const findRoomIdByFromDate = await Repository.findRoomIdAndFromDateToDateToUpDate(RoomId, Fdate, id, hotelId);
+            const lengthObjectFromDate = Object.keys(findRoomIdByFromDate).length;
+            if (lengthObjectFromDate > 0) {
+                return Promise.reject({ messager: `Check-in date cannot coincide with the booked time`, result: findRoomIdByFromDate });
+
+            }
+            const findRoomIdByToDate = await Repository.findRoomIdAndFromDateToDateToUpDate(RoomId, Tdate, id, hotelId);
+            const lengthObjectToDate = Object.keys(findRoomIdByToDate).length;
+            if (lengthObjectToDate > 0) {
+                return Promise.reject({ messager: `Check-out date must not coincide with the booked time`, result: findRoomIdByToDate });
+
+            }
+            return Promise.resolve();
+        }
+    }
+
+
+    public checkBetweenToCreate = async (fromDate: Date, toDate: Date, RoomId: any, hotelId: any) => {
+        const findRoomId = await Repository.findBetweenFromDateAndToDate(RoomId, fromDate, toDate, hotelId);
+        const lengthObject = Object.keys(findRoomId).length;
+        if (lengthObject > 0) {
+            return Promise.reject({ message: "This time period is already booked, please choose a reasonable reservation time", result: findRoomId })
+        }
+        return Promise.resolve()
+    }
+    public checkBetweenToUpdate = async (roomId: any, fromDate: any, toDate: any, id: any, hotelId: any) => {
+        const findRoomId = await Repository.findBetweenFromDateAndToDateToUpDate(roomId, fromDate, toDate, id, hotelId);
+        const lengthObject = Object.keys(findRoomId).length;
+        if (lengthObject > 0) {
+            return Promise.reject({ message: "This time period is already booked, please choose a reasonable reservation time", result: findRoomId })
+        }
+        return Promise.resolve()
+    }
 }

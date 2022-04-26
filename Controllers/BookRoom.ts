@@ -5,10 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { StatusCode } from './StatusCode';
 import { BaseController } from './BaseController';
 
-
-
-const baseController = new BaseController();
-const statusCode = new StatusCode();
 const service = new BookRoomService();
 const tokenService = new TokenService();
 
@@ -33,13 +29,12 @@ export class BookRoomController extends BaseController {
     public create = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
         item.id = uuidv4();
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const UserId = await tokenService.findUserIdWhereToken(token);
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
+
         try {
-            await service.checkInput(item.customerName, item.customerIdCard, item.fromDate, item.toDate, item.roomId, item.userId)
-            await service.checkUserId(item.userId)
-            await service.checkRoomId(item.roomId)
-            await service.checkTimeFromDateToCreate(item.roomId, item.fromDate);
-            await service.checkTimeToDateToCreate(item.fromDate, item.toDate, item.roomId);
-            const result = await service.create(item)
+            const result = await service.create(item, HotelId, UserId);
             this.sendResponse(result, req, res.status(200))
         }
         catch (err) {
@@ -52,14 +47,12 @@ export class BookRoomController extends BaseController {
     public update = async (req: Request, res: Response, next: NextFunction) => {
         const item = req.body;
         const id = req.params.id;
-        item.updatedAt = new Date();
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const UserId = await tokenService.findUserIdWhereToken(token);
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
         try {
-            await service.checkInput(item.customerName, item.customerIdCard, item.fromDate, item.toDate, item.roomId, item.userId)
-            await service.checkUserId(item.userId)
-            await service.checkRoomId(item.roomId)
-            await service.checkTimeFromDateToUpdate(item.roomId, item.fromDate, id);
-            await service.checkTimeToDateToUpdate(item.fromDate, item.toDate, item.roomId, id);
-            const result = await service.update(id, item);
+
+            const result = await service.update(id, item, HotelId, UserId);
             this.sendResponse(result, req, res.status(200));
         }
         catch (error) {
@@ -79,20 +72,12 @@ export class BookRoomController extends BaseController {
         }
     }
 
-    public findItem = async (req: Request, res: Response, next: NextFunction) => {
-        const item = req.body;
-        try {
-            const result = await service.findItem(item);
-            this.sendResponse(result, req, res.status(200));
-        } catch (error) {
-            this.sendResponse(error, req, res.status(400))
-        }
-    }
-
     public delete = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.params.id;
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
         try {
-            const result = await service.delete(id);
+            const result = await service.delete(id, HotelId);
             this.sendResponse(result, req, res.status(200));
         } catch (error) {
             this.sendResponse(error, req, res.status(400))

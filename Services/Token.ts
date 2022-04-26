@@ -13,6 +13,8 @@ export class TokenService {
         return Promise.resolve(hotelId);
     }
 
+
+
     public createToken = async (userId: any) => {
 
         const accesToken = jwt.sign({ userId }, "JWT");
@@ -29,9 +31,15 @@ export class TokenService {
         if (rs) {
             const checkRole = await repository.findRole(accesToken);
             const role = checkRole[0].name;
-            const checkHotelName = await repository.findHotelWhereToken(accesToken);
-            const HotelName = checkHotelName[0].name;
-            return Promise.resolve({ Token: accesToken, role: role, hotelName: HotelName });
+            if (role == "Root") {
+                return Promise.resolve({ Token: accesToken, role: role });
+            }
+            else {
+                const checkHotelName = await repository.findHotelWhereToken(accesToken);
+                const HotelName = checkHotelName[0].name;
+                return Promise.resolve({ Token: accesToken, role: role, hotelName: HotelName });
+            }
+
         }
         return Promise.reject({ messager: "Create Faild" })
 

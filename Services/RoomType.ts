@@ -1,10 +1,8 @@
 
-import { HotelRepository } from '../Repositories/Repository/Hotel';
 import { RoomTypeRepository } from '../Repositories/Repository/RoomType';
-import { RoomRepository } from '../Repositories/Repository/Room';
+import { v4 as uuidv4 } from 'uuid';
 
-//const Repository = new RoomRepository();
-const hotelRepository = new HotelRepository();
+
 const Repository = new RoomTypeRepository();
 
 
@@ -19,12 +17,20 @@ export class RoomTypeService {
         return Promise.resolve({ result: rs })
     }
 
-    public create = async (item: []) => {
+    public create = async (item: any, hotelId: any) => {
+        item.hotelId = hotelId;
+        item.id = uuidv4();
+        await this.checkValidInput(item.type, item.price)
+        await this.checkValidateRoomTypeName(item.type, hotelId);
         await Repository.create(item);
         return Promise.resolve({ result: item })
     }
 
-    public update = async (id: string, item: [], hotelId: string) => {
+    public update = async (id: string, item: any, hotelId: string) => {
+        item.id = id;
+        await this.checkValidInput(item.type, item.price);
+        await this.findOne(id, hotelId);
+        await this.checkValidateRoomTypeNameOtherId(item.type, hotelId, id);
         await Repository.update(id, item);
         return Promise.resolve({ result: item });
 
@@ -72,20 +78,18 @@ export class RoomTypeService {
         return Promise.reject({ messager: "Type name already exists" });
     }
 
-    public checkPriceValidate = (price: number) => {
-        if (price < 0) {
-            return Promise.reject({ messager: "Please enter an amount greater than 0" })
-        }
-        else {
-            return Promise.resolve();
-        }
-    }
     public checkValidInput = (type: any, price: any) => {
         if (type.trim() == null || type.trim() == "") {
             return Promise.reject({ message: "Please enter Room Type" })
         }
         if (price.trim() == null || price.trim() == "") {
             return Promise.reject({ message: "Please enter price" })
+        }
+        if (isNaN(price)) {
+            return Promise.reject({ message: "Please enter a series of numbers in price" })
+        }
+        if (price < 0) {
+            return Promise.reject({ messager: "Please enter an amount greater than 0" })
         }
         return Promise.resolve();
     }

@@ -19,6 +19,7 @@ export abstract class KnexRepository<T> implements RepositoryGeneral<T> {
         return knex(this.tableName)
             .select()
     }
+    
     findAllWhereHotelId(hotelId: string): Promise<T[]> {
         return knex.table(this.tableName)
             .select()
@@ -26,9 +27,7 @@ export abstract class KnexRepository<T> implements RepositoryGeneral<T> {
     }
     findOneWhereHotelId(id: string, hotelId: string): Promise<boolean> {
         return knex(this.tableName)
-            .where({
-                id: id
-            })
+            .where({id: id})
             .andWhere("hotelId", "=", hotelId) //làm vầy để tránh việc user của khách sạn này mà xem được user của khách sạn kia
             .select()
     }

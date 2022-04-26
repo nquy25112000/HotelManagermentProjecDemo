@@ -1,6 +1,5 @@
 import { RoomTypeService } from '../Services/RoomType'
 import { Request, Response, NextFunction } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 import { StatusCode } from './StatusCode';
 import { BaseController } from './BaseController';
 import { TokenService } from '../Services/Token';
@@ -23,16 +22,11 @@ export class RoomTypeController extends BaseController {
     }
 
     public create = async (req: Request, res: Response, next: NextFunction) => {
-        const item = await req.body;
+        const item = req.body;
         const token = req.headers["authorization"]?.split(" ")[1];
         const HotelId = await tokenService.findHotelIdWhereToken(token);
-        item.hotelId = HotelId;
-        item.id = uuidv4();
         try {
-            await service.checkValidInput(item.type, item.price)
-            await service.checkPriceValidate(item.price);
-            await service.checkValidateRoomTypeName(item.type, HotelId);
-            const result = await service.create(item);
+            const result = await service.create(item, HotelId);
             this.sendResponse(result, req, res.status(200));
         }
         catch (err) {
@@ -46,14 +40,8 @@ export class RoomTypeController extends BaseController {
         const id = req.params.id;
         const token = req.headers["authorization"]?.split(" ")[1];
         const HotelId = await tokenService.findHotelIdWhereToken(token);
-        item.hotelId = HotelId;
-        item.id = id;
         try {
 
-            await service.checkValidInput(item.type, item.price);
-            await service.checkPriceValidate(item.price);
-            await service.findOne(id, HotelId);
-            await service.checkValidateRoomTypeNameOtherId(item.type, HotelId, id);
             const result = await service.update(id, item, HotelId);
             this.sendResponse(result, req, res.status(200));
         }

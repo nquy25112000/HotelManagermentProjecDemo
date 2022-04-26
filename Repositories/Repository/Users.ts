@@ -30,11 +30,12 @@ export class UsersRepository extends KnexRepository<Users> {
             .andWhere('hotelId', '=', hotelId)
             .select()
     };
-    
+
     findAllWhereHotelOtherUserId(hotelId: string, id: string): Promise<any> {
         return knex.table(this.tableName)
             .select()
             .where(this.tableName + ".hotelId", "=", hotelId)
             .andWhere(this.tableName + ".id", "!=", id)
     }
+
 }

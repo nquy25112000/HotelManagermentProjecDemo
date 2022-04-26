@@ -1,9 +1,8 @@
-import { AnyARecord } from 'dns';
+
 import { BookRoomRepository } from '../Repositories/Repository/BookRoom';
-import { HotelRepository } from '../Repositories/Repository/Hotel';
-import { RoleRepository } from '../Repositories/Repository/Role';
 import { RoomRepository } from '../Repositories/Repository/Room';
 import { RoomTypeRepository } from '../Repositories/Repository/RoomType';
+import { v4 as uuidv4 } from 'uuid';
 
 const Repository = new RoomRepository();
 const bookRoomRepository = new BookRoomRepository();
@@ -17,15 +16,25 @@ export class RoomService {
         if (lengthObject == 0) {
             return Promise.reject({ messager: "No data to display" })
         }
-        return Promise.resolve({ result: rs })
+        return Promise.resolve({ result: rs });
     }
 
-    public create = async (item: []) => {
+    public create = async (item: any, hotelId: any) => {
+        item.hotelId = hotelId;
+        item.id = uuidv4();
+        item.status = 0;
+        await this.checkValidInput(item.name, item.roomTypeId);
+        await this.checkValidateRoomNameToCreate(item.name, hotelId);
+        await this.checkValidRoomTypeId(item.roomTypeId, hotelId);
         await Repository.create(item);
-        return Promise.resolve({ result: item })
+        return Promise.resolve({ result: item });
     }
 
-    public update = async (id: string, item: [], hotelId: string) => {
+    public update = async (id: string, item: any, hotelId: string) => {
+        item.id = id;
+        await this.checkValidInput(item.name, item.roomTypeId);
+        await this.checkValidateRoomNameToUpdate(item.name, hotelId, id);
+        await this.checkValidRoomTypeId(item.roomTypeId, hotelId);
         await Repository.update(id, item);
         return Promise.resolve({ result: item });
     }
@@ -43,7 +52,7 @@ export class RoomService {
                 return Promise.reject({ messager: "This room contains some booking data, Please clear the reservation data before deleting the Room" })
             }
             await Repository.delete(id);
-            const rs = await Repository.findAllWhereHotelId(hotelId)
+            const rs = await Repository.findAllWhereHotelId(hotelId);
             return Promise.resolve({ result: rs });
         }
 
@@ -58,6 +67,8 @@ export class RoomService {
         return Promise.resolve({ result: rs });
     }
 
+
+
     public checkValidateRoomNameToCreate = async (item: any, hotelid: string) => {
         const rs = await Repository.checkValidateRoomName(item, hotelid);
         if (Object.keys(rs).length == 0) {
@@ -69,7 +80,7 @@ export class RoomService {
     public checkValidateRoomNameToUpdate = async (item: any, hotelid: string, id: string) => {
         const rs = await Repository.checkValidateRoomNameOtherId(item, hotelid, id);
         if (Object.keys(rs).length == 0) {
-            return Promise.resolve()
+            return Promise.resolve();
         }
         return Promise.reject({ messager: "Room name already exists" });
     }
@@ -83,22 +94,13 @@ export class RoomService {
         return Promise.resolve();
     }
 
-    public checkValidInput = (name: string, roomtypeId: string, status: number) => {
+    public checkValidInput = (name: string, roomtypeId: string) => {
         if (name.trim() == null || name.trim() == "" || name == undefined) {
-            return Promise.reject({ message: "Please enter room Name" })
+            return Promise.reject({ message: "Please enter room Name" });
         }
         if (roomtypeId.trim() == null || roomtypeId.trim() == "" || roomtypeId == undefined) {
-            return Promise.reject({ message: "Please select room type" })
-        }
-        if (status == null || status == undefined) {
-            return Promise.reject({ message: "Please select room type" })
-        }
-        if (status < 0 || status > 1) {
-            return Promise.reject({ message: "Please select 0 or 1" })
+            return Promise.reject({ message: "Please select room type" });
         }
         return Promise.resolve();
     }
-
-
-
 }
