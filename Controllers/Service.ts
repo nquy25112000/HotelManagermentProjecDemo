@@ -21,9 +21,6 @@ export class ServicesController {
                 baseController.sendResponse(result, req, res);
             })
             .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
-
-
-
     }
 
     public create =async (req: Request, res: Response, next: NextFunction) => {

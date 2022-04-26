@@ -5,8 +5,9 @@ export class Connect {
             host: 'localhost',
             user: 'root',
             password: '',
-            database: 'test',
-            charset: 'utf8'
+            database: 'Hotel_18_4',
+            charset: 'utf8',
+            timezone : 'UTC'
         }
     })
 }

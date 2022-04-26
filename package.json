@@ -24,6 +24,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
+    "@types/nodemailer": "^6.4.4",
     "body-parser": "^1.19.2",
     "bookshelf": "^1.2.0",
     "cloudmailin": "^0.0.3",
@@ -31,9 +32,12 @@
     "db-migrate": "^0.11.13",
     "db-migrate-mysql": "^2.2.0",
     "dotenv": "^16.0.0",
+    "email-check": "^1.1.0",
+    "email-existence": "^0.1.6",
     "express": "^4.17.3",
     "express-json": "^1.0.0",
     "express-session": "^1.17.2",
+    "googleapis": "^100.0.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^1.0.4",
     "mysql": "^2.18.1",

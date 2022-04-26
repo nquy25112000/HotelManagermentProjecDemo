@@ -10,11 +10,7 @@ export class ServicesService {
         if (typeof item.name === "undefined" || !item.name) {
             return Promise.reject({ messager: "Name Invalid !" });
         }
-        // const name = await Repository.checkNameService(item.name);
-        // if (Object.keys(name).length > 0) {
-        //     return Promise.reject({ messager: "Name already exists !" });
-        // }
-        if (typeof item.price === "string" || typeof item.price === "undefined" || !item.price || item.price < 1) {
+        if (typeof item.price === "undefined" || !item.price || item.price < 1) {
             return Promise.reject({ messager: "Price Invalid !" });
         }
         if (typeof item.hotelId === "undefined") {
@@ -49,18 +45,25 @@ export class ServicesService {
         return Promise.resolve({ result: rs })
     }
 
+    public checkServiceIdHotelIdDelete =async (id: string, hotelId: string) => {
+        const rs = await Repository.checkServiceByHotelId(id, hotelId);
+        if (Object.keys(rs).length == 0) {
+            return Promise.reject({ messager: "Service Id not exists!" });
+        }
+    }
+
     public create = async (item: any) => {
 
         try {
-            const validService = await new ServicesService().checkvalidateService(item);
+            await new ServicesService().checkvalidateService(item);
             await new ServicesService().checkvalidateNameServiceCreate(item.name, item.hotelId); // tim xem service cos trong HotelId do chua
             try {
                 const rs = await Repository.create(item);
                 if (rs) {
-                    const service = await Repository.findOne(item.id);
+                    // const service = await Repository.findOne(item.id);
                     return Promise.resolve({
                         messager: "Sucsuess",
-                        inforService: service
+                        inforService: item
                     });
                 }
 
@@ -74,14 +77,13 @@ export class ServicesService {
     }
     public update = async (id: string, item: any) => {
         try {
-            const validService = await new ServicesService().checkvalidateService(item);
+            await new ServicesService().checkvalidateService(item);
             await new ServicesService().checkvalidateNameServiceUpdate(id, item.name, item.hotelId);
             try {
                 const rs = await Repository.update(id, item);
                 if (rs) {
-
                     const service: any = await Repository.findOne(id);
-                    console.log(service);
+                    // console.log(service);
                     return Promise.resolve({
                         messager: "Sucsess",
                         inforService: service[0]
@@ -101,6 +103,7 @@ export class ServicesService {
     }
     public delete = async (id: string, HotelId: string) => {
         try {
+            await new ServicesService().checkServiceIdHotelIdDelete(id , HotelId);
             const rs = await Repository.delete(id)
             const inforService = await Repository.findAllWhereHotelId(HotelId);;
             if (rs == 0) {
