@@ -10,11 +10,7 @@ export class ServicesService {
         if (typeof item.name === "undefined" || !item.name) {
             return Promise.reject({ messager: "Name Invalid !" });
         }
-        // const name = await Repository.checkNameService(item.name);
-        // if (Object.keys(name).length > 0) {
-        //     return Promise.reject({ messager: "Name already exists !" });
-        // }
-        if (typeof item.price === "string" || typeof item.price === "undefined" || !item.price || item.price < 1) {
+        if (typeof item.price === "undefined" || !item.price || item.price < 1) {
             return Promise.reject({ messager: "Price Invalid !" });
         }
         if (typeof item.hotelId === "undefined") {
@@ -81,7 +77,6 @@ export class ServicesService {
                 if (rs) {
 
                     const service: any = await Repository.findOne(id);
-                    console.log(service);
                     return Promise.resolve({
                         messager: "Sucsess",
                         inforService: service[0]

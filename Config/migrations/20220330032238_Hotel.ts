@@ -46,7 +46,7 @@ export async function up(knex: Knex): Promise<void> {
         .createTable('Services', function (table) {
             table.specificType('id', 'CHAR(36)').notNullable().primary();
             table.string('name', 255).notNullable();
-            table.float('price').notNullable();
+            table.float('price', 100).notNullable();
             table.timestamp('createdAt')
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP'));
             table

@@ -51,8 +51,8 @@ export class TokenController extends BaseController {
             .catch((err) => {
                 res.status(403).json(err)
             })
-
     }
+
     public RoleAdminAndUser = (req: Request, res: Response, next: NextFunction) => {
         const author = req.headers['authorization'];
         const token = author?.split(" ")[1];
