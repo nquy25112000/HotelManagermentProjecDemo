@@ -83,7 +83,6 @@ export class ServicesService {
                 const rs = await Repository.update(id, item);
                 if (rs) {
                     const service: any = await Repository.findOne(id);
-                    // console.log(service);
                     return Promise.resolve({
                         messager: "Sucsess",
                         inforService: service[0]
