@@ -27,5 +27,10 @@ export class ServiceOrdersRepository extends KnexRepository<ServiceOrders> {
                                     .andOn('Room.hotelId', knex.raw('?', [hotelId]))})   
     }
 
-    
+    findAllServiceOrderbyHotelId( hotelId : string): Promise<ServiceOrders[]> {
+        return knex.select('ServiceOrders.id','ServiceOrders.number', 'ServiceOrders.total', 'ServiceOrders.bookRoomId ', 'ServiceOrders.serviceId ' , 'ServiceOrders.createdAt', 'ServiceOrders.updatedAt' )
+        .from('ServiceOrders')
+        .innerJoin('Services', function() { this.on('Services.hotelId  ', knex.raw('?', [hotelId ]))  
+                                    .andOn('ServiceOrders.serviceId ', '=', ' Services.id')})   
+    }
 }

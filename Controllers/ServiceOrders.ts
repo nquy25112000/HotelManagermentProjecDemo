@@ -12,9 +12,10 @@ const tokenService = new TokenService();
 export class ServiceOrdersController {
 
 
-    public findAll = (req: Request, res: Response, next: NextFunction) => {
-
-        service.findAll()
+    public findAll =async (req: Request, res: Response, next: NextFunction) => {
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
+        service.findAll(HotelId)
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })

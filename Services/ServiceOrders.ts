@@ -11,8 +11,8 @@ const BookroomRepo = new BookRoomRepository();
 
 
 export class ServiceOrdersService {
-    public findAll = async () => {
-        const rs = await Repository.findAll();
+    public findAll = async (hotelId: string) => {
+        const rs = await Repository.findAllServiceOrderbyHotelId(hotelId);
         if (rs == null) {
             return Promise.reject({ messager: "Not Found" })
         }
