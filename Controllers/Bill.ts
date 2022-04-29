@@ -48,8 +48,8 @@ export class BillController {
     public getTotalBill  = async  (req: Request, res: Response, next: NextFunction) => {
         const token = req.headers["authorization"]?.split(" ")[1];
         const HotelId = await tokenService.findHotelIdWhereToken(token);
-        const item = req.body;
-        service.getTotalBill(item, HotelId)
+        const id = req.params.id;
+        service.getTotalBill(id, HotelId)
         .then(result => {
             baseController.sendResponse(result, req, res);
         })

@@ -69,6 +69,16 @@ export class ServiceOrdersService {
         }
     }
 
+    public checkvalidateServiveOrderId  = async (serviceOrderId : string , hotelId : string)=> {
+        const rs = await Repository.checkServiceOrderIdByHotelId( serviceOrderId, hotelId);
+        if (Object.keys(rs).length == 0) {
+            return Promise.reject({ messager: "ServiceOrder not exists !" })
+        }
+        else {
+            return Promise.resolve( rs );
+        }
+    }
+
     public create = async (item: any , hotelId: any) => {
         try {
             var object: any = [];
@@ -121,12 +131,17 @@ export class ServiceOrdersService {
     }
 
     public delete = async (id: string , hotelId : string) => {
-        await new ServiceOrdersService().checkvalidateServive(id , hotelId)
-        const rs = await Repository.delete(id);
-        if (rs == 0) {
-            return Promise.reject({ messager: "Delete Faild" });
+        try {
+            await new ServiceOrdersService().checkvalidateServiveOrderId(id , hotelId)
+            const rs = await Repository.delete(id);
+            if (rs == 0) {
+                return Promise.reject({ messager: "Delete Faild" });
+            }
+            return Promise.resolve({ messager: "Sucsuess" });
+    
+        } catch (error) {
+            return Promise.reject(error);
         }
-        return Promise.resolve({ messager: "Sucsuess" });
     }
 
     public findOne = async (id: string) => {

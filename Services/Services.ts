@@ -55,6 +55,7 @@ export class ServicesService {
             await new ServicesService().checkvalidateService(item , hotelId);
             await new ServicesService().checkvalidateNameServiceCreate(item.name, hotelId); // tim xem service cos trong HotelId do chua
             try {
+                item.hotelId = hotelId;
                 const rs = await Repository.create(item);
                 if (rs) {
                     // const service = await Repository.findOne(item.id);
