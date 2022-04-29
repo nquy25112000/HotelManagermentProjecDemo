@@ -39,19 +39,19 @@ export class BillService {
        } 
     }
 
-    public getTotalBill  = async (item: any, hotelId: any) => {
+    public getTotalBill  = async (id: any, hotelId: any) => {
         try {
-            const {price, inforBookroom} : any = await new BillService().getBookroomdAndPrice(item.bookRoomId , hotelId);
+            const {price, inforBookroom} : any = await new BillService().getBookroomdAndPrice(id , hotelId);
             try {
-                const totalService : any = await ServiceOrdersRepo.totalService(item.bookRoomId); // sum total service        
+                const totalService : any = await ServiceOrdersRepo.totalService(id); // sum total service        
                 const inforUser : any = await userRepo.findOne(inforBookroom[0].userId); // Property '0' does not exist on type 'Boolean'
-                const inforServiceOder = await   Repository.getInforserviceOrder(item.bookRoomId)
+                const inforServiceOder = await   Repository.getInforserviceOrder(id)
                 const totalBill = totalService[0].sum + price; // console.log(total[0].sum); // 0:RowDataPacket {sum: 40000}
-                item.total = totalBill;
+                // item.total = totalBill;
                 // update status room after printf bill
                     return Promise.resolve({
                     messager : "Sucsuess",
-                    inforBookroom : inforBookroom , 
+                    inforBookroom : inforBookroom[0] , 
                     inforServiceOder : inforServiceOder,
                     inforUser : inforUser[0].fullName,
                     totalBill : totalBill
@@ -77,7 +77,7 @@ export class BillService {
                 const rs = await Repository.create(item);
                 if(rs) {
                     const  payment : any = {paymentDate : new Date()} ;
-                    await BookRoomRepo.update(inforBookroom[0].idRoom, payment); // update payment room after printf bill
+                    await BookRoomRepo.update(inforBookroom[0].id, payment); // update payment room after printf bill
                     return Promise.resolve({
                     messager : "Sucsuess",
                     inforBookroom : inforBookroom[0] , 

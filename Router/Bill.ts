@@ -18,7 +18,7 @@ export class BillRouter {
 
     routers() {
         this.Router.get('/findAll', Controller.findAll);
-        this.Router.get('/getTotalBill', Controller.getTotalBill);
+        this.Router.get('/getTotalBill/:id', Controller.getTotalBill);
         this.Router.get('/findOne/:id', Controller.findOne);
         this.Router.get('/findItem', Controller.findItem);
 
