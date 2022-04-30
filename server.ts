@@ -114,9 +114,9 @@ class Server {
             .use('/users', tokenController.authorization, usersRouter.Router)
             .use('/room', tokenController.authorization, roomRouter.Router)
             .use('/roomtype', tokenController.authorization, roomTypeRouter.Router)
-            .use('/bill', tokenController.authorization, billRouter.Router)
+            .use('/bill', tokenController.authorization,tokenController.RoleAdminAndUser, billRouter.Router)
             .use('/services', tokenController.authorization, serviceRouter.Router)
-            .use('/orders', tokenController.authorization, serviceOrdersRouter.Router)
+            .use('/orders', tokenController.authorization,tokenController.RoleAdminAndUser, serviceOrdersRouter.Router)
             .use('/bookroom', tokenController.authorization, bookRoomRouter.Router)
             .use('/statistical-month', tokenController.authorization, statisticalRouter.Router)
             

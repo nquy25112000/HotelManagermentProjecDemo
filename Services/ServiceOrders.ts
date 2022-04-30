@@ -26,7 +26,7 @@ export class ServiceOrdersService {
         const rs = await Repository.checkBookroomByHotelId(bookRoomId , hotelid);
         
         if (Object.keys(rs).length == 0) {
-            return Promise.reject({ messager: "BookRoom Invalid !" })
+            return Promise.reject({ messager: "BookRoom  not exists !" })
         }
         else {
             return Promise.resolve( rs );
@@ -95,19 +95,23 @@ export class ServiceOrdersService {
             try {
                 const rs = await Repository.create(object);
                 if (rs) { //=> >(1) [0] 
-                    return Promise.resolve({ messager: "Sucsuess" })     
+                    return Promise.resolve({
+                         messager: "Sucsuess",
+                         inforServiceOrder : object
+                         })     
                 }
             } catch (error) {
-                return Promise.reject({ messager: "Create Faild " })
+                return Promise.reject({ messager: "Create Faild " });
            }
         } catch (error) {
-            return Promise.reject(error)
+            return Promise.reject(error);
         }
     }
 
 
     public update = async (id: string, item: any , hotelId : any) => {
         try {
+            await new ServiceOrdersService().checkvalidateServiveOrderId(id , hotelId);
             const bookRoom = await new ServiceOrdersService().checkvalidateBookRoom(item.bookRoomId, hotelId); 
             const service : any = await new ServiceOrdersService().checkvalidateServive(item.serviceId , hotelId);
             const number = await new ServiceOrdersService().checkvalidateNumberService(item.number)
@@ -116,28 +120,32 @@ export class ServiceOrdersService {
             try {
                 const rs = await Repository.update(id, item);
                 if (rs) {
-                    return Promise.resolve({ messager: "Sucsess" });
-                }
-                else{
-                    return Promise.reject({ messager: " ServiceOrders Id not exists ! " })
+                    return Promise.resolve({
+                         messager: "Sucsess",
+                         inforServiceOrder : item 
+                    });
                 }
             } catch (error) {
-                return Promise.reject({ messager: "Update Faild" })
+                return Promise.reject({ messager: "Update Faild" });
             }
         } catch (error) {
-            return Promise.reject(error)
+            return Promise.reject(error);
         }
        
     }
 
     public delete = async (id: string , hotelId : string) => {
         try {
-            await new ServiceOrdersService().checkvalidateServiveOrderId(id , hotelId)
+            await new ServiceOrdersService().checkvalidateServiveOrderId(id , hotelId);
+            const serviceOreder = await new ServiceOrdersService().findAll(hotelId);
             const rs = await Repository.delete(id);
             if (rs == 0) {
                 return Promise.reject({ messager: "Delete Faild" });
             }
-            return Promise.resolve({ messager: "Sucsuess" });
+            return Promise.resolve({
+                 messager: "Sucsuess",
+                 inforServiceOrder : serviceOreder 
+                 });
     
         } catch (error) {
             return Promise.reject(error);
@@ -147,18 +155,28 @@ export class ServiceOrdersService {
     public findOne = async (id: string) => {
         const rs = await Repository.findOne(id)
         if (rs == false) {
-            return Promise.reject({ messager: "Not Found" })
+            return Promise.reject({ messager: "Not Found" });
         }
         return Promise.resolve({ result: rs })
     }
 
-    public findServiceByBookroom = async (id: string) => { // tim bookromid do dat cac service nao 
-        const rs = await BillRepo.getInforserviceOrder(id);
-        if (Object.keys(rs).length == 0) {
-            return Promise.resolve( {
-                messager: "BookRoom not order services !" 
-                , result: rs } );         
-        }
+    public findServiceByBookroom = async (id: string , hotelId : string) => { // tim bookromid do dat cac service nao 
+       try {
+            await new ServiceOrdersService().checkvalidateBookRoom(id, hotelId); 
+            const rs = await BillRepo.getInforserviceOrder(id);
+            if (Object.keys(rs).length == 0) {  
+                return Promise.resolve( {
+                    messager: "BookRoom does not book service !" 
+                    , result: rs } );         
+            }
+            else {
+                return Promise.resolve( {
+                    messager: "Sucsess !" 
+                    , result: rs } ); 
+            }
+       } catch (error) {
+            return Promise.reject(error);
+       }
         // else {
         //     return Promise.reject({ messager: "BookRoom not order services !" })
         // }
