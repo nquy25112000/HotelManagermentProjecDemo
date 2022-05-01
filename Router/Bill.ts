@@ -21,6 +21,7 @@ export class BillRouter {
     }
 
     routers() {
+
         this.Router.get('/findAll', tokenController.RoleAdminAndUser, Controller.findAll);
         this.Router.get('/getTotalBill/:id', tokenController.RoleAdminAndUser, Controller.getTotalBill);
         this.Router.get('/findOne/:id', tokenController.RoleAdminAndUser, Controller.findOne);

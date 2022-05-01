@@ -25,7 +25,7 @@ import { ServiceOrdersRouter } from './Router/ServiceOrders'
 import { RoomTypeRouter } from './Router/Roomtype'
 import { RoomRouter } from './Router/Room'
 import { LoginRouter } from './Router/Login'
-import { StatisticalRouter } from './Router/Statistical'
+import {StatisticalRouter} from './Router/Statistical'
 
 import { TokenController } from './Controllers/Token'
 const tokenController = new TokenController();
