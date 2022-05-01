@@ -22,6 +22,12 @@ export class TokenRepository {
             .select()
             .where({ tokenCode: token })
     }
+
+    checkTimeToken(token: string): Promise<any> {
+        return knex("Token")
+            .select()
+            .where({ tokenCode: token })
+    }
     findUserIdWhereToken(token: any): Promise<any> {
         return knex.table('Users')
             .select("Users.id")
@@ -36,9 +42,18 @@ export class TokenRepository {
             .innerJoin("Token", "Token.userId", "=", "Users.id")
             .where({ tokenCode: token })
     }
-    updateTimeExpire(token: string, time: any): Promise<any> {
+
+    //handdle token
+    findToKenCodeAndTimeExpire(token: string): Promise<any> {
+        return knex.raw(`SELECT * FROM Token WHERE tokenCode = '${token}' AND  timeExpire > CURRENT_TIME()`)
+    }
+    updateTimeExpire(token: string): Promise<any> {
+        return knex.raw(`UPDATE Token SET timeExpire = ADDTIME(CURRENT_TIME(), '3:00:00') Where tokenCode = '${token}'`)
+    }
+    deleteWhereToken(token: string): Promise<any> {
         return knex.table("Token")
-            .update({ timeExpire: time })
             .where({ tokenCode: token })
+            .delete()
+
     }
 }

@@ -21,9 +21,6 @@ export class ServicesController {
                 baseController.sendResponse(result, req, res);
             })
             .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
-
-
-
     }
 
     public create =async (req: Request, res: Response, next: NextFunction) => {
@@ -31,8 +28,7 @@ export class ServicesController {
         const HotelId = await tokenService.findHotelIdWhereToken(token);
         const item = req.body;
         item.id = uuidv4();
-        item.hotelId = HotelId;
-        service.create(item)
+        service.create(item, HotelId)
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })
@@ -45,8 +41,7 @@ export class ServicesController {
         const HotelId = await tokenService.findHotelIdWhereToken(token);
         const id = req.params.id;
         item.updatedAt = new Date();
-        item.hotelId = HotelId;
-        service.update(id, item)
+        service.update(id, item ,HotelId )
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })

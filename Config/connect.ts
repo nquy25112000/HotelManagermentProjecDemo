@@ -6,7 +6,7 @@ export class Connect {
             port: '3306',
             user: 'root',
             password: '',
-            database: 'test',
+            database: 'hotel',
             charset: 'utf8',
             timezone: 'UTC'
         }

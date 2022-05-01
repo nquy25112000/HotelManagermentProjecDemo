@@ -24,11 +24,27 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
             .select();
     }
 
-    //Check date book room
+
+    findAllBookRoomWhereHotelIdPaymentNull(id: string): Promise<any> {
+        return knex.table(bookRoom.tableName)
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName")
+            .innerJoin("Room", "Room.id", "=", "BookRoom.roomId")
+            .where('Room.hotelId', "=", id)
+            .havingNull('BookRoom.paymentDate')
+    }
+    findOneBookRoomWhereHotelId(hotelId: string, bookRoomId: any): Promise<any> {
+        return knex.table(bookRoom.tableName)
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName")
+            .innerJoin("Room", "Room.id", "=", "BookRoom.roomId")
+            .where('Room.hotelId', "=", hotelId)
+            .andWhere("BookRoom.id", "=", bookRoomId)
+            .havingNull('BookRoom.paymentDate')
+    }
+    //Check date valid bookroom
 
     findRoomIdAndFromDateToDateToCreate(roomId: any, date: any, hotelId: any): Promise<any> {
         return knex.table(bookRoom.tableName)
-            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.roomId", "Room.name as roomName", "BookRoom.userId")
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.roomId", "Room.name as roomName")
             .innerJoin("Room", "Room.id", "=", "BookRoom.roomId")
             .where('BookRoom.roomId', '=', roomId)
             .andWhere('Room.hotelId', '=', hotelId)
@@ -38,7 +54,7 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
     }
     findRoomIdAndFromDateToDateToUpDate(roomId: any, date: any, id: any, hotelId: any): Promise<any> {
         return knex.table(bookRoom.tableName)
-            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName", "BookRoom.userId")
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName")
             .innerJoin("Room", "Room.id", "=", "BookRoom.roomId")
             .where('BookRoom.roomId', '=', roomId)
             .andWhere('Room.hotelId', "=", hotelId)
@@ -48,9 +64,11 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
     }
 
 
+    // find between fromDate and toDate
+
     findBetweenFromDateAndToDate(roomId: any, Fdate: any, Tdate: any, hotelId: any): Promise<any> {
         return knex.table(bookRoom.tableName)
-            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName", "BookRoom.userId")
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName")
             .innerJoin("Room", "Room.id", "=", "BookRoom.roomId")
             .where('roomId', '=', roomId)
             .andWhere('Room.hotelId', "=", hotelId)
@@ -58,10 +76,9 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
 
     }
 
-
     findBetweenFromDateAndToDateToUpDate(roomId: any, Fdate: any, Tdate: any, id: any, hotelId: any): Promise<any> {
         return knex.table(bookRoom.tableName)
-            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName", "BookRoom.userId")
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName")
             .innerJoin("Room", "Room.id", "=", "BookRoom.roomId")
             .where('roomId', '=', roomId)
             .andWhere('Room.hotelId', "=", hotelId)
@@ -71,30 +88,44 @@ export class BookRoomRepository extends KnexRepository<BookRoom> {
 
     //----------------------------------
 
-    findExistCustomerIdCard(date: any, hotelId: any, customerIdCard: any): Promise<any> {
+    findExistCustomerIdCardToCreate(date: any, hotelId: any, customerIdCard: any): Promise<any> {
         return knex.table(bookRoom.tableName)
-            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName", "BookRoom.userId")
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId")
             .innerJoin("Users", "Users.id", "=", "BookRoom.userId")
             .where('Users.hotelId', '=', hotelId)
+            .andWhere('BookRoom.customerIdCard', "=", customerIdCard)
             .andWhere('BookRoom.fromDate', '<=', date)
             .andWhere('BookRoom.toDate', '>=', date)
+    }
+    findExistCustomerIdCardToUpdate(date: any, hotelId: any, customerIdCard: any, id: any): Promise<any> {
+        return knex.table(bookRoom.tableName)
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId")
+            .innerJoin("Users", "Users.id", "=", "BookRoom.userId")
+            .where('Users.hotelId', '=', hotelId)
             .andWhere('BookRoom.customerIdCard', "=", customerIdCard)
+            .andWhere('BookRoom.id', '!=', id)
+            .andWhere('BookRoom.fromDate', '<=', date)
+            .andWhere('BookRoom.toDate', '>=', date)
     }
 
+    //
+    findBetweenExistCustomerIdCardCREATE(Fdate: any, Tdate: any, hotelId: any, customerIdCard: any): Promise<any> {
+        return knex.table(bookRoom.tableName)
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId",)
+            .innerJoin("Users", "Users.id", "=", "BookRoom.userId")
+            .andWhere('Users.hotelId', "=", hotelId)
+            .andWhere('BookRoom.customerIdCard', "=", customerIdCard)
+            .andWhereBetween('BookRoom.fromDate', [Fdate, Tdate])
 
-    findAllBookRoomWhereHotelIdPaymentNull(id: string): Promise<any> {
-        return knex.table(bookRoom.tableName)
-            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName", "BookRoom.userId")
-            .innerJoin("Room", "Room.id", "=", "BookRoom.roomId")
-            .where('Room.hotelId', "=", id)
-            .havingNull('BookRoom.paymentDate')
     }
-    findOneBookRoomWhereHotelId(hotelId: string, bookRoomId: any): Promise<any> {
+    findBetweenExistCustomerIdCardUPDATE(Fdate: any, Tdate: any, hotelId: any, id: any, customerIdCard: any): Promise<any> {
         return knex.table(bookRoom.tableName)
-            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId", "Room.name as roomName", "BookRoom.userId")
-            .innerJoin("Room", "Room.id", "=", "BookRoom.roomId")
-            .where('Room.hotelId', "=", hotelId)
-            .andWhere("BookRoom.id", "=", bookRoomId)
-            .havingNull('BookRoom.paymentDate')
+            .select("BookRoom.id", "BookRoom.customerName", "BookRoom.customerIdCard", "BookRoom.fromDate", "BookRoom.toDate", "BookRoom.paymentDate", "BookRoom.roomId",)
+            .innerJoin("Users", "Users.id", "=", "BookRoom.userId")
+            .andWhere('Users.hotelId', "=", hotelId)
+            .andWhere('BookRoom.customerIdCard', "=", customerIdCard)
+            .andWhereBetween('BookRoom.fromDate', [Fdate, Tdate])
+            .andWhere("BookRoom.id", "!=", id)
+
     }
 }

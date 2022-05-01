@@ -26,7 +26,7 @@ export class UsersService {
         item.id = uuidv4();
         await this.checkValidInput(item.username, item.password, item.fullName, item.birtDate, item.adress, item.phone, item.roleId);
         await this.checkRoleId(item.roleId);
-        await this.checkUserName(item.username, hotelId);
+        await this.checkUserName(item.username);
         await this.checkValidCharactersUsername(item.username);
         await this.checkValidCharactersFullName(item.fullName);
         await Repository.create(item);
@@ -89,8 +89,8 @@ export class UsersService {
         return rs;
     }
 
-    public checkUserName = async (username: string, hotelId: string) => {
-        const rs = await Repository.findUserNameById(username, hotelId);
+    public checkUserName = async (username: string) => {
+        const rs = await Repository.findUserName(username);
         const lengthObject = Object.keys(rs).length;
         if (lengthObject > 0) {
             return Promise.reject({ message: "Username already exists" });

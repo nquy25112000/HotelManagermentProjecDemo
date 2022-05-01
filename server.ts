@@ -25,6 +25,7 @@ import { ServiceOrdersRouter } from './Router/ServiceOrders'
 import { RoomTypeRouter } from './Router/Roomtype'
 import { RoomRouter } from './Router/Room'
 import { LoginRouter } from './Router/Login'
+import { StatisticalRouter } from './Router/Statistical'
 
 import { TokenController } from './Controllers/Token'
 const tokenController = new TokenController();
@@ -44,6 +45,7 @@ const serviceRouter = new ServiceRouter();
 const serviceOrdersRouter = new ServiceOrdersRouter();
 const bookRoomRouter = new BookRoomRouter();
 const roomTypeRouter = new RoomTypeRouter();
+const statisticalRouter = new StatisticalRouter();
 
 const options = {
     definition: {
@@ -116,19 +118,11 @@ class Server {
             .use('/services', tokenController.authorization, serviceRouter.Router)
             .use('/orders', tokenController.authorization, serviceOrdersRouter.Router)
             .use('/bookroom', tokenController.authorization, bookRoomRouter.Router)
-
+            .use('/statistical-month', tokenController.authorization, statisticalRouter.Router)
             .use('/login', login.Router)
-
-
 
             .post('/login', passportController.Authenticate, tokenController.createToken)
 
-
-
-            .get('/test', tokenController.authorization, tokenController.RoleRoot, (req, res) => {
-
-                res.json("đăng nhập thành công")
-            })
 
 
     }

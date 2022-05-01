@@ -4,24 +4,30 @@ import { v4 as uuidv4 } from 'uuid';
 import { StatusCode } from './StatusCode';
 const statusCode = new StatusCode();
 import { BaseController } from './BaseController';
+import { TokenService } from '../Services/Token'
+
+const tokenService = new TokenService();
 const baseController = new BaseController();
 const service = new BillService();
 
 export class BillController {
 
-    public findAll = (req: Request, res: Response, next: NextFunction) => {
-
-        service.findAll()
+    public findAll = async (req: Request, res: Response, next: NextFunction) => {
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
+        service.findAll(HotelId)
         .then(result => {
             baseController.sendResponse(result, req, res);
         })
         .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
 }
 
-    public create =  (req: Request, res: Response, next: NextFunction) => {
+    public create = async  (req: Request, res: Response, next: NextFunction) => {
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
         const item = req.body;
         item.id = uuidv4();
-        service.create(item)
+        service.create(item ,HotelId )
         .then(result => {
             baseController.sendResponse(result, req, res);
         })
@@ -39,10 +45,23 @@ export class BillController {
         .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
     }
 
-    public findOne =  (req: Request, res: Response, next: NextFunction) => {
+    public getTotalBill  = async  (req: Request, res: Response, next: NextFunction) => {
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
+        const id = req.params.id;
+        service.getTotalBill(id, HotelId)
+        .then(result => {
+            baseController.sendResponse(result, req, res);
+        })
+        .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
+    }
+
+    public findOne = async  (req: Request, res: Response, next: NextFunction) => {
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
         const item = req.body;
         const id = req.params.id;
-        service.findOne(id)
+        service.findOne(id, HotelId)
         .then(result => {
             baseController.sendResponse(result, req, res);
         })

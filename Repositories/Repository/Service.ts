@@ -26,4 +26,11 @@ export class ServiceRepository extends KnexRepository<Service> {
                 .select()
                 ;
     }
+
+    checkServiceByHotelId(id : string , hotelId : string): Promise<Service[]> {
+        return knex.select()
+        .from('Services')
+        .where('id', '=', id)
+        .andWhere('hotelId ', '=', hotelId)
+    }
 }
