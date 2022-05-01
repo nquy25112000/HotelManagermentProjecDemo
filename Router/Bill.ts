@@ -2,6 +2,10 @@ import express from 'express';
 import { Router } from "express";
 import { BillController } from "../Controllers/Bill"
 import bodyParser from 'body-parser';
+import { TokenController } from '../Controllers/Token';
+
+
+const tokenController = new TokenController();
 
 
 const Controller = new BillController();
@@ -17,14 +21,15 @@ export class BillRouter {
     }
 
     routers() {
-        this.Router.get('/findAll', Controller.findAll);
-        this.Router.get('/getTotalBill/:id', Controller.getTotalBill);
-        this.Router.get('/findOne/:id', Controller.findOne);
-        this.Router.get('/findItem', Controller.findItem);
 
-        this.Router.post('/create', Controller.create);
-        this.Router.put('/update/:id', Controller.update);
-        this.Router.delete('/delete/:id', Controller.delete);
+        this.Router.get('/findAll', tokenController.RoleAdminAndUser, Controller.findAll);
+        this.Router.get('/getTotalBill/:id', tokenController.RoleAdminAndUser, Controller.getTotalBill);
+        this.Router.get('/findOne/:id', tokenController.RoleAdminAndUser, Controller.findOne);
+        this.Router.get('/findItem', tokenController.RoleAdminAndUser, Controller.findItem);
+
+        this.Router.post('/create', tokenController.RoleAdminAndUser, Controller.create);
+        this.Router.put('/update/:id', tokenController.RoleAdminAndUser, Controller.update);
+        this.Router.delete('/delete/:id', tokenController.RoleAdminAndUser, Controller.delete);
     }
 
     public config(): void {

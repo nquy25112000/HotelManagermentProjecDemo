@@ -26,7 +26,7 @@ export async function up(knex: Knex): Promise<void> {
                 .timestamp('updatedAt')
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
             table.specificType('hotelId', 'CHAR(36)').notNullable();
-            table.foreign('hotelId').references('id').inTable('Hotel').onUpdate("CASCADE");
+            table.foreign('hotelId').references('id').inTable('Hotel').onUpdate("CASCADE").onDelete("CASCADE");
         })
         .createTable('Room', function (table) {
             table.specificType('id', 'CHAR(36)').notNullable().primary();
@@ -38,10 +38,10 @@ export async function up(knex: Knex): Promise<void> {
                 .timestamp('updatedAt')
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
             table.specificType('hotelId', 'CHAR(36)').notNullable();
-            table.foreign('hotelId').references('id').inTable('Hotel').onUpdate("CASCADE");
+            table.foreign('hotelId').references('id').inTable('Hotel').onUpdate("CASCADE").onDelete("CASCADE");
 
             table.specificType('roomTypeId', 'CHAR(36)').notNullable();
-            table.foreign('roomTypeId').references('id').inTable('RoomType').onUpdate("CASCADE");
+            table.foreign('roomTypeId').references('id').inTable('RoomType').onUpdate("CASCADE").onDelete("CASCADE");
         })
         .createTable('Services', function (table) {
             table.specificType('id', 'CHAR(36)').notNullable().primary();
@@ -53,7 +53,7 @@ export async function up(knex: Knex): Promise<void> {
                 .timestamp('updatedAt')
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
             table.specificType('hotelId', 'CHAR(36)').notNullable();
-            table.foreign('hotelId').references('id').inTable('Hotel').onUpdate("CASCADE");
+            table.foreign('hotelId').references('id').inTable('Hotel').onUpdate("CASCADE").onDelete("CASCADE");
         })
         .createTable('Role', function (table) {
             table.specificType('id', 'CHAR(36)').notNullable().primary();
@@ -78,17 +78,18 @@ export async function up(knex: Knex): Promise<void> {
                 .timestamp('updatedAt')
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
             table.specificType('hotelId', 'CHAR(36)');
-            table.foreign('hotelId').references('id').inTable('Hotel').onUpdate("CASCADE");
+            table.foreign('hotelId').references('id').inTable('Hotel').onUpdate("CASCADE").onDelete("CASCADE");
 
             table.specificType('roleId', 'CHAR(36)').notNullable();
-            table.foreign('roleId').references('id').inTable('Role').onUpdate("CASCADE");
+            table.foreign('roleId').references('id').inTable('Role').onUpdate("CASCADE").onDelete("CASCADE");
         })
         .createTable('BookRoom', function (table) {
             table.specificType('id', 'CHAR(36)').notNullable().primary();
             table.string('customerName', 255).notNullable();
-            table.integer('customerIdCard', 11).notNullable();
+            table.integer('customerIdCard', 20).notNullable();
             table.datetime('fromDate').notNullable();
             table.datetime('toDate').notNullable()
+            table.datetime('paymentDate').notNullable()
             table.timestamp('createdAt')
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP'));
             table
@@ -96,10 +97,10 @@ export async function up(knex: Knex): Promise<void> {
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 
             table.specificType('roomId', 'CHAR(36)').notNullable();
-            table.foreign('roomId').references('id').inTable('Room').onUpdate("CASCADE");
+            table.foreign('roomId').references('id').inTable('Room').onUpdate("CASCADE").onDelete("CASCADE");
 
             table.specificType('userId', 'CHAR(36)').notNullable();
-            table.foreign('userId').references('id').inTable('Users').onUpdate("CASCADE");
+            table.foreign('userId').references('id').inTable('Users').onUpdate("CASCADE").onDelete("CASCADE");
         })
         .createTable('ServiceOrders', function (table) {
             table.specificType('id', 'CHAR(36)').notNullable().primary();
@@ -113,10 +114,10 @@ export async function up(knex: Knex): Promise<void> {
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 
             table.specificType('bookRoomId', 'CHAR(36)').notNullable();
-            table.foreign('bookRoomId').references('id').inTable('BookRoom').onUpdate("CASCADE");
+            table.foreign('bookRoomId').references('id').inTable('BookRoom').onUpdate("CASCADE").onDelete("CASCADE");
 
             table.specificType('serviceId', 'CHAR(36)').notNullable();
-            table.foreign('serviceId').references('id').inTable('Services').onUpdate("CASCADE");
+            table.foreign('serviceId').references('id').inTable('Services').onUpdate("CASCADE").onDelete("CASCADE");
         })
         .createTable('Bill', function (table) {
             table.specificType('id', 'CHAR(36)').notNullable().primary();
@@ -131,21 +132,23 @@ export async function up(knex: Knex): Promise<void> {
             table.foreign('bookRoomId').references('id').inTable('BookRoom').onUpdate("CASCADE").onDelete("CASCADE");
         })
         .then(async () => {
-            const id = uuidv4();
-            await knex("Role")
-                .insert([
-                    { id: id, name: "Root" }
-                ])
-                .insert([
-                    { id: id, name: "Admin" }
-                ])
-                .insert([
-                    { id: id, name: "User" }
-                ])
+            const id1 = uuidv4();
+            const id2 = uuidv4();
+            const id3 = uuidv4();
+            const id5 = uuidv4();
+            await knex("Role").insert([
+                { id: id1, name: "Root" }
+            ])
+            await knex("Role").insert([
+                { id: id2, name: "Admin" }
+            ])
+            await knex("Role").insert([
+                { id: id3, name: "User" }
+            ])
 
 
             await knex.schema
-                .raw(`INSERT INTO Users(id, username, password, roleId) VALUES ('${id}','a', 'b' , (SELECT id FROM Role where name = 'Root'))`)
+                .raw(`INSERT INTO Users(id, username, password, roleId) VALUES ('${id5}','a', 'b' , (SELECT id FROM Role where name = 'Root'))`)
         })
 
 
