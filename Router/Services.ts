@@ -28,8 +28,8 @@ export class ServiceRouter {
         this.Router.post('/create',tokenController.RoleAdmin, Controller.create);
         this.Router.put('/update/:id',tokenController.RoleAdmin, Controller.update);
         this.Router.delete('/delete/:id',tokenController.RoleAdmin, Controller.delete);
-    }
 
+    }
     public config(): void {
         this.Router.use(express.json());
         this.Router.use(bodyParser.urlencoded({ extended: true }));

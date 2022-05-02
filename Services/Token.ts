@@ -18,14 +18,10 @@ export class TokenService {
     public createToken = async (userId: any) => {
 
         const accesToken = jwt.sign({ userId }, "JWT");
-        const today = new Date();
-        const newDate = today.getTime() + 10800000; //cộng 3 tiếng, nhưng cộng mili giây
-        const date = new Date(newDate);
         const item = {
             id: uuidv4(),
             tokenCode: accesToken,
             userId: userId,
-            timeExpire: date
         }
         const rs = await repository.create(item);
         if (rs) {
@@ -52,7 +48,7 @@ export class TokenService {
     }
 
 
-
+    //check token and time token
     public checkToken = async (token: any) => {
         if (token == undefined) {
             return Promise.reject({ messager: "Need verification code" });
@@ -62,21 +58,21 @@ export class TokenService {
             return Promise.reject({ messager: "Invalid verification code" });
         }
         else {
-            const today = new Date();
-            const MilisecondTodate = today.getTime();
-            const milisecondTimeExpire = await findToken[0].timeExpire.getTime();
-            if (MilisecondTodate > milisecondTimeExpire) {
+            const findTokenCode = await repository.findToKenCodeAndTimeExpire(token)
+            const itemToken = findTokenCode[0];
+            if (itemToken.length == 0) {
+                await repository.deleteWhereToken(token)
                 return Promise.reject({ messager: "Session has expired, please login again" });
             }
-
-            const newMilisecondTimeExpire = MilisecondTodate + 10800000;
-            const date = new Date(newMilisecondTimeExpire);
-            await repository.updateTimeExpire(token, date);
-            return Promise.resolve();
+            else {
+                await repository.updateTimeExpire(token);
+                return Promise.resolve();
+            }
         }
-
     }
 
+
+    //check role
     public RoleRootAndAdmin = async (token: any) => {
         const result = await repository.findRole(token) //xem token đó có quyền gì
         const roleName = result[0].name;

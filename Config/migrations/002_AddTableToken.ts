@@ -6,9 +6,10 @@ export async function up(knex: Knex): Promise<void> {
         .createTable('Token', function (table) {
             table.specificType('id', 'CHAR(36)').notNullable().primary();
             table.string('tokenCode', 255).notNullable();
-            table.dateTime('timeExpire').notNullable();
+            table.timestamp('timeExpire')
+                .defaultTo(knex.raw("ADDTIME(CURTIME(), '3:00:00')"));
             table.specificType('userId', 'CHAR(36)').notNullable();
-            table.foreign('userId').references('id').inTable('Users').onUpdate("CASCADE");
+            table.foreign('userId').references('id').inTable('Users').onUpdate("CASCADE").onDelete("CASCADE");
             table.timestamp('createdAt')
                 .defaultTo(knex.raw('CURRENT_TIMESTAMP'));
             table

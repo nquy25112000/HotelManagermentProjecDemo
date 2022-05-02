@@ -119,19 +119,10 @@ class Server {
             .use('/orders', tokenController.authorization,tokenController.RoleAdminAndUser, serviceOrdersRouter.Router)
             .use('/bookroom', tokenController.authorization, bookRoomRouter.Router)
             .use('/statistical-month', tokenController.authorization, statisticalRouter.Router)
-            
             .use('/login', login.Router)
-
-
 
             .post('/login', passportController.Authenticate, tokenController.createToken)
 
-
-
-            .get('/test', tokenController.authorization, tokenController.RoleRoot, (req, res) => {
-
-                res.json("đăng nhập thành công")
-            })
 
 
     }
