@@ -21,15 +21,15 @@ export class ServiceRouter {
     }
 
     routers() {
-        this.Router.get('/findAll', tokenController.RoleAdmin, Controller.findAll);
-        this.Router.get('/findOne/:id', tokenController.RoleAdmin, Controller.findOne);
-        this.Router.get('/findItem', tokenController.RoleAdmin, Controller.findItem);
+        this.Router.get('/findAll',tokenController.RoleAdminAndUser, Controller.findAll);
+        this.Router.get('/findOne/:id',tokenController.RoleAdminAndUser, Controller.findOne);
+        this.Router.get('/findItem',tokenController.RoleAdminAndUser, Controller.findItem);
 
-        this.Router.post('/create', tokenController.RoleAdminAndUser, Controller.create);
-        this.Router.put('/update/:id', tokenController.RoleAdminAndUser, Controller.update);
-        this.Router.delete('/delete/:id', tokenController.RoleAdminAndUser, Controller.delete);
+        this.Router.post('/create',tokenController.RoleAdmin, Controller.create);
+        this.Router.put('/update/:id',tokenController.RoleAdmin, Controller.update);
+        this.Router.delete('/delete/:id',tokenController.RoleAdmin, Controller.delete);
+
     }
-
     public config(): void {
         this.Router.use(express.json());
         this.Router.use(bodyParser.urlencoded({ extended: true }));

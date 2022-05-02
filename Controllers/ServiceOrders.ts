@@ -60,10 +60,11 @@ export class ServiceOrdersController {
             .catch(err => { baseController.sendResponse(err, req, res.status(500)); });
     }
 
-    public findOne = (req: Request, res: Response, next: NextFunction) => {
-        const item = req.body;
+    public findOne =async (req: Request, res: Response, next: NextFunction) => {
+        const token = req.headers["authorization"]?.split(" ")[1];
+        const HotelId = await tokenService.findHotelIdWhereToken(token);
         const id = req.params.id;
-        service.findServiceByBookroom(id)
+        service.findServiceByBookroom(id, HotelId)
             .then(result => {
                 baseController.sendResponse(result, req, res);
             })

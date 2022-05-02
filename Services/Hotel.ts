@@ -70,7 +70,7 @@ export class HotelService {
         if(!item.adress  || typeof item.adress === "undefined" ){
             return Promise.reject({ messager: "Adress Invalid !" });
         }
-        if(!item.phone  || typeof item.phone === "undefined" ){
+        if(!item.phone  || typeof item.phone === "undefined" || typeof item.phone === "string" ){
             return Promise.reject({ messager: "Phone Invalid !" });
         }
         if(item.phone.length < 10){
@@ -131,11 +131,15 @@ export class HotelService {
             const {username , password } = await new HotelService().randomPassUser(10);
             const iduser = uuidv4();
             const user : any =  {id:  `${iduser}`  , fullName : 'admin', username: `${username}`,password : `${password}` , birtDate : '', adress : '', phone : '', hotelId : `${idHotel}` , roleId :   `${idRoleAdmin[0].id}` };
-            const rs = await UserRepo.create(user);
-            if (rs) {
+           try {
                 const mail = await new HotelService().sendMail(username,password, nameHotel, emailhotel );
-                return Promise.resolve(iduser);           
-            }
+                const rs = await UserRepo.create(user);
+                if (rs) {   
+                    return Promise.resolve(iduser);           
+                }
+           } catch (error) {
+                return Promise.reject(error); 
+           }
         } catch (error) {
             return Promise.reject({messager : "Create User Faild !!! "});
         }
@@ -157,7 +161,7 @@ export class HotelService {
                     });           
                 }
             } catch (error) {
-                return Promise.reject({messager : "Create Faild !!!"});
+                return Promise.reject(error);
             }
         } catch (error) {
             return Promise.reject(error);
@@ -188,13 +192,17 @@ export class HotelService {
     }
     public delete = async (id: string) => {
        try {
+            const hotel = await new HotelService().findAll()
             const rs = await Repository.delete(id);
             if (rs == 0) {
                 return Promise.reject({ messager: "Delete Faild" })
             }
-            return Promise.resolve({messager : "Sucsuess"})
+            return Promise.resolve({
+                messager : "Sucsuess",
+                inforHotel :  hotel
+            })
        } catch (error) {
-        return Promise.reject({ messager: "Error Delete !!" }) /// error k xoa dc vi lien ket voi User
+        return Promise.reject(error) /// error k xoa dc vi lien ket voi User
        }
     }
 
