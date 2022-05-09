@@ -6,9 +6,9 @@ export class Connect {
             port: '3306',
             user: 'root',
             password: '',
-            database: 'Hotel_18_4',
+            database: 'hotel123',
             charset: 'utf8',
-            timezone : 'UTC'
+            timezone: 'UTC'
 
         }
     })

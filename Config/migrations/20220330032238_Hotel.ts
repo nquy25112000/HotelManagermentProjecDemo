@@ -86,7 +86,7 @@ export async function up(knex: Knex): Promise<void> {
         .createTable('BookRoom', function (table) {
             table.specificType('id', 'CHAR(36)').notNullable().primary();
             table.string('customerName', 255).notNullable();
-            table.integer('customerIdCard', 20).notNullable();
+            table.string('customerIdCard', 20).notNullable();
             table.datetime('fromDate').notNullable();
             table.datetime('toDate').notNullable()
             table.datetime('paymentDate').notNullable()
@@ -145,13 +145,9 @@ export async function up(knex: Knex): Promise<void> {
             await knex("Role").insert([
                 { id: id3, name: "User" }
             ])
-
-
             await knex.schema
-                .raw(`INSERT INTO Users(id, username, password, roleId) VALUES ('${id5}','a', 'b' , (SELECT id FROM Role where name = 'Root'))`)
+                .raw(`INSERT INTO Users(id, username, password, roleId) VALUES ('${id5}','root', '123456' , (SELECT id FROM Role where name = 'Root'))`)
         })
-
-
 
 }
 
